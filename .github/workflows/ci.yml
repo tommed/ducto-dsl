@@ -24,11 +24,23 @@ jobs:
         with:
           go-version: '1.24'
 
+      - name: Install linters
+        run: make lint-install
+
       - name: Verify Go modules
         run: go mod tidy && git diff --exit-code
+
+      - name: Lint
+        run: make lint
 
       - name: Run All Tests
         run: make test-all
 
       - name: Build macOS CLI
         run: make cli-macos
+
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.out
