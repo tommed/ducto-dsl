@@ -34,7 +34,9 @@ jobs:
         run: make lint
 
       - name: Run All Tests
-        run: make test-all
+        run: |
+          make test-all
+          make coverage
 
       - name: Build macOS CLI
         run: make cli-macos
@@ -53,3 +55,11 @@ jobs:
         with:
           name: coverage-report
           path: coverage.out
+
+      - name: Deploy Coverage HTML to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
+          allow_empty_commit: false
