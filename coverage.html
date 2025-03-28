@@ -57,7 +57,7 @@
 				
 				<option value="file0">github.com/tommed/dsl-transformer/cmd/transformer-cli/main.go (0.0%)</option>
 				
-				<option value="file1">github.com/tommed/dsl-transformer/internal/cli/runner.go (92.0%)</option>
+				<option value="file1">github.com/tommed/dsl-transformer/internal/cli/runner.go (100.0%)</option>
 				
 				<option value="file2">github.com/tommed/dsl-transformer/internal/dsl/transformer.go (100.0%)</option>
 				
@@ -118,13 +118,13 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span 
         <span class="cov9" title="5">progFile := args[0]
 
         progData, err := os.ReadFile(progFile)
-        if err != nil </span><span class="cov4" title="2">{
+        if err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "failed to read program file: %v\n", err)
                 return 1
         }</span>
 
-        <span class="cov6" title="3">var prog dsl.Program
-        if err := json.Unmarshal(progData, &amp;prog); err != nil </span><span class="cov0" title="0">{
+        <span class="cov7" title="4">var prog dsl.Program
+        if err := json.Unmarshal(progData, &amp;prog); err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "failed to parse program: %v\n", err)
                 return 1
         }</span>

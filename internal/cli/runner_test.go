@@ -51,10 +51,10 @@ func Test_RunCLI(t *testing.T) {
 			name: "invalid json instructions file",
 			args: args{
 				input: goodInput,
-				args:  []string{"../../invalid-json.json"},
+				args:  []string{"../../test/data/invalid-json.json"},
 			},
 			want:            1,
-			wantErrContains: "failed to read program file",
+			wantErrContains: "failed to parse program",
 		},
 		{
 			name: "invalid json input piped in",
