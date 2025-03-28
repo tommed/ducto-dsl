@@ -27,3 +27,21 @@ func TestTransformer_Apply_NoOp(t *testing.T) {
 	assert.Equal(t, "bar", out["foo"])
 	assert.Equal(t, "hello world", out["greeting"])
 }
+
+func TestTransformer_Apply_InvalidOp(t *testing.T) {
+	// Assemble
+	tr := New()
+	input := map[string]interface{}{"foo": "bar"}
+
+	prog := &Program{
+		Instructions: []Instruction{
+			{Op: "invalid-op", Key: "foo", Value: 2},
+		},
+	}
+
+	// Act
+	_, err := tr.Apply(context.Background(), input, prog)
+
+	// Assert
+	assert.Error(t, err)
+}
