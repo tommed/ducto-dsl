@@ -9,10 +9,6 @@
 *.dylib
 cli-macos
 
-# Code Coverage
-#coverage.out
-#coverage.html
-
 # Test binary, built with `go test -c`
 *.test
 

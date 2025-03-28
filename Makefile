@@ -1,29 +1,65 @@
+# ----------------------
+# Configuration
+# ----------------------
+
 COVERAGE_OUT=coverage.out
+GO=go
+LINTER=golangci-lint
+LINTER_REMOTE=github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+LINTER_OPTS=--timeout=2m
 
-.PHONY: cli example-simplest test test-all coverage lint lint-install
+# ----------------------
+# General Targets
+# ----------------------
 
-cli-macos:
-	go build -o cli-macos ./cmd/transformer-cli
-cli:
-	go run ./cmd/transformer-cli
+.PHONY: all check ci lint test test-full coverage example-simplest clean
 
-example-simplest:
-	echo '{"foo":"bar"}' | go run ./cmd/transformer-cli examples/simplest.json
+all: check
 
-# Run short unit tests quickly
-test:
-	go test -short -v ./...
+check: lint test-full coverage
 
-# Run full test suite and measure coverage
-test-all:
-	go test -coverprofile=$(COVERAGE_OUT) -covermode=atomic -v ./...
-	go tool cover -func=$(COVERAGE_OUT)
+ci: check example-simplest cli-macos
 
-coverage:
-	go tool cover -html=$(COVERAGE_OUT) -o coverage.html
+clean:
+	@rm -f $(COVERAGE_OUT) coverage.html cli-macos
 
-lint-install:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+# ----------------------
+# Linting
+# ----------------------
 
 lint:
-	golangci-lint run --timeout=5m
+	@echo "==> Running linter"
+	$(LINTER) run $(LINTER_OPTS)
+
+lint-install:
+	go install $(LINTER_REMOTE)
+
+# ----------------------
+# Testing
+# ----------------------
+
+test:
+	@echo "==> Running short tests"
+	$(GO) test -short -coverprofile=$(COVERAGE_OUT) -covermode=atomic -v ./...
+	$(GO) tool cover -func=$(COVERAGE_OUT)
+
+test-full:
+	@echo "==> Running full tests"
+	$(GO) test -coverprofile=$(COVERAGE_OUT) -covermode=atomic -v ./...
+	$(GO) tool cover -func=$(COVERAGE_OUT)
+
+coverage:
+	@echo "==> Generating coverage HTML report"
+	$(GO) tool cover -html=$(COVERAGE_OUT) -o coverage.html
+
+# ----------------------
+# CLI
+# ----------------------
+
+example-simplest:
+	@echo "==> Running simplest example"
+	@echo '{"foo":"bar"}' | $(GO) run ./cmd/transformer-cli examples/simplest.json
+
+cli-macos:
+	@echo "==> Building macOS CLI"
+	$(GO) build -o cli-macos ./cmd/transformer-cli
