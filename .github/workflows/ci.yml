@@ -39,7 +39,16 @@ jobs:
       - name: Build macOS CLI
         run: make cli-macos
 
-      - name: Upload Coverage Artifact
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.out
+          flags: unittests
+          name: codecov-coverage
+          fail_ci_if_error: true
+
+      - name: Upload Coverage as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
