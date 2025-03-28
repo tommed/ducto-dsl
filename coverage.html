@@ -57,7 +57,7 @@
 				
 				<option value="file0">github.com/tommed/dsl-transformer/cmd/transformer-cli/main.go (0.0%)</option>
 				
-				<option value="file1">github.com/tommed/dsl-transformer/internal/dsl/transformer.go (88.9%)</option>
+				<option value="file1">github.com/tommed/dsl-transformer/internal/dsl/transformer.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -153,29 +153,29 @@ type Program struct {
 type Transformer struct{}
 
 // New creates a new Transformer
-func New() *Transformer <span class="cov8" title="1">{
+func New() *Transformer <span class="cov10" title="2">{
         return &amp;Transformer{}
 }</span>
 
 // Apply applies the given transformation definition
-func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) <span class="cov8" title="1">{
+func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) <span class="cov10" title="2">{
 
         // Create our output, start with the input values
         output := make(map[string]interface{})
-        for k, v := range input </span><span class="cov8" title="1">{
+        for k, v := range input </span><span class="cov10" title="2">{
                 output[k] = v
         }</span>
 
-        <span class="cov8" title="1">for _, instr := range prog.Instructions </span><span class="cov8" title="1">{
+        <span class="cov10" title="2">for _, instr := range prog.Instructions </span><span class="cov10" title="2">{
                 switch instr.Op </span>{
-                case "set":<span class="cov8" title="1">
+                case "set":<span class="cov1" title="1">
                         output[instr.Key] = instr.Value</span>
-                default:<span class="cov0" title="0">
+                default:<span class="cov1" title="1">
                         return nil, errors.New("unsupported op: " + instr.Op)</span>
                 }
         }
 
-        <span class="cov8" title="1">return output, nil</span>
+        <span class="cov1" title="1">return output, nil</span>
 }
 </pre>
 		
