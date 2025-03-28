@@ -32,16 +32,8 @@ jobs:
       - name: Verify Go modules
         run: go mod tidy && git diff --exit-code
 
-      - name: Lint
-        run: make lint
-
-      - name: Run All Tests
-        run: |
-          make test-full
-          make coverage
-
-      - name: Build macOS CLI
-        run: make cli-macos
+      - name: Makefile CI
+        run: make ci
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

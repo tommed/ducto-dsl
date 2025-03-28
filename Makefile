@@ -16,12 +16,12 @@ LINTER_OPTS=--timeout=2m
 
 all: check
 
-check: lint test coverage
+check: lint test-full coverage
 
-ci: check example-simplest
+ci: check example-simplest cli-macos
 
 clean:
-	@rm -f $(COVERAGE_OUT) coverage.html
+	@rm -f $(COVERAGE_OUT) coverage.html cli-macos
 
 # ----------------------
 # Linting
@@ -59,3 +59,7 @@ coverage:
 example-simplest:
 	@echo "==> Running simplest example"
 	@echo '{"foo":"bar"}' | $(GO) run ./cmd/transformer-cli examples/simplest.json
+
+cli-macos:
+	@echo "==> Building macOS CLI"
+	$(GO) build -o cli-macos ./cmd/transformer-cli
