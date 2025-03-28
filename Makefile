@@ -5,6 +5,7 @@
 COVERAGE_OUT=coverage.out
 GO=go
 LINTER=golangci-lint
+LINTER_REMOTE=github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 LINTER_OPTS=--timeout=2m
 
 # ----------------------
@@ -29,6 +30,9 @@ clean:
 lint:
 	@echo "==> Running linter"
 	$(LINTER) run $(LINTER_OPTS)
+
+lint-install:
+	go install $(LINTER_REMOTE)
 
 # ----------------------
 # Testing
