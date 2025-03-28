@@ -12,7 +12,7 @@ LINTER_OPTS=--timeout=2m
 # General Targets
 # ----------------------
 
-.PHONY: all check ci lint test test-full coverage example-simplest clean
+.PHONY: all check ci lint test test-full coverage example-simplest clean cli-macos
 
 all: check
 
@@ -62,4 +62,4 @@ example-simplest:
 
 cli-macos:
 	@echo "==> Building macOS CLI"
-	$(GO) build -o cli-macos ./cmd/transformer-cli
+	GOOS=darwin GOARCH=arm64 $(GO) build -o cli-macos ./cmd/transformer-cli
