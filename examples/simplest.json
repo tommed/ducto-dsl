@@ -1,0 +1,9 @@
+{
+  "instructions": [
+    {
+      "op": "set",
+      "key": "greeting",
+      "value": "hello world"
+    }
+  ]
+}

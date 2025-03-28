@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, feature/**]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Verify Go modules
+        run: go mod tidy && git diff --exit-code
+
+      - name: Run All Tests
+        run: make test-all
+
+      - name: Build macOS CLI
+        run: make cli-macos
