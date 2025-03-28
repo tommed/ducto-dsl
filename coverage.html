@@ -57,7 +57,7 @@
 				
 				<option value="file0">github.com/tommed/dsl-transformer/cmd/transformer-cli/main.go (0.0%)</option>
 				
-				<option value="file1">github.com/tommed/dsl-transformer/internal/cli/runner.go (60.0%)</option>
+				<option value="file1">github.com/tommed/dsl-transformer/internal/cli/runner.go (92.0%)</option>
 				
 				<option value="file2">github.com/tommed/dsl-transformer/internal/dsl/transformer.go (100.0%)</option>
 				
@@ -107,42 +107,42 @@ import (
 )
 
 //goland:noinspection GoUnhandledErrorResult
-func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span class="cov8" title="1">{
+func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span class="cov10" title="6">{
 
         // Pre-Guards
-        if len(args) &lt; 1 </span><span class="cov0" title="0">{
+        if len(args) &lt; 1 </span><span class="cov1" title="1">{
                 fmt.Fprintln(stderr, "usage: transformer-cli &lt;program.json&gt;")
                 return 1
         }</span>
 
-        <span class="cov8" title="1">progFile := args[0]
+        <span class="cov9" title="5">progFile := args[0]
 
         progData, err := os.ReadFile(progFile)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov4" title="2">{
                 fmt.Fprintf(stderr, "failed to read program file: %v\n", err)
                 return 1
         }</span>
 
-        <span class="cov8" title="1">var prog dsl.Program
+        <span class="cov6" title="3">var prog dsl.Program
         if err := json.Unmarshal(progData, &amp;prog); err != nil </span><span class="cov0" title="0">{
                 fmt.Fprintf(stderr, "failed to parse program: %v\n", err)
                 return 1
         }</span>
 
-        <span class="cov8" title="1">var input map[string]interface{}
-        if err := json.NewDecoder(stdin).Decode(&amp;input); err != nil </span><span class="cov0" title="0">{
+        <span class="cov6" title="3">var input map[string]interface{}
+        if err := json.NewDecoder(stdin).Decode(&amp;input); err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "failed to parse input json: %v\n", err)
                 return 1
         }</span>
 
-        <span class="cov8" title="1">tr := dsl.New()
+        <span class="cov4" title="2">tr := dsl.New()
         out, err := tr.Apply(context.Background(), input, &amp;prog)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "error: %v\n", err)
                 return 1
         }</span>
 
-        <span class="cov8" title="1">enc := json.NewEncoder(stdout)
+        <span class="cov1" title="1">enc := json.NewEncoder(stdout)
         enc.SetIndent("", "  ")
         _ = enc.Encode(out)
         return 0</span>

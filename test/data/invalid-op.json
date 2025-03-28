@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "instructions": [
+    {
+      "op": "invalid_op",
+      "key": "greeting",
+      "value": "hello world"
+    }
+  ]
+}
