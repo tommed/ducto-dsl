@@ -24,13 +24,13 @@ A sequence of instructions executed in order.
 
 ## 🟣 On Error
 
-By default, if an operation is not successful the program will continue anyway. You can change this behaviour using `on_failure`.
+By default, if an operation is not successful the program will continue anyway. You can change this behaviour using `on_error`.
 
-| Value    | Behaviour                                                |
-|----------|----------------------------------------------------------|
-| `ignore` | Default behaviour, just keep going                       |
-| `fail`   | Will stop on the first failure                           |
-| `error`  | Will collect all errors in the array field `@dsl_errors` |
+| Value     | Behaviour                                                |
+|-----------|----------------------------------------------------------|
+| `ignore`  | Default behaviour, just keep going                       |
+| `fail`    | Will stop on the first failure                           |
+| `capture` | Will collect all errors in the array field `@dsl_errors` |
 
 ## 🟣 Operators
 

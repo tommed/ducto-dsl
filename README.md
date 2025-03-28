@@ -81,7 +81,7 @@ make lint         # Run static analysis
 ### CLI
 
 ```bash
-make example-simplest
+make cli-macos
 ```
 
 ## Status
