@@ -37,7 +37,7 @@ jobs:
 
       - name: Run All Tests
         run: |
-          make test-all
+          make test-full
           make coverage
 
       - name: Build macOS CLI

@@ -67,7 +67,7 @@ Output:
 
 ```bash
 make test         # Short tests
-make test-all     # Full tests
+make test-full    # Full tests
 make coverage     # Coverage report (HTML)
 make lint-install # Install lint prerequisites
 make lint         # Run static analysis
