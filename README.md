@@ -19,6 +19,10 @@ It is:
 - 🟣 Composable
 - 🟩 Fully testable
 
+## DSL Specification
+
+See [SPEC.md](./SPEC.md) for a specification of the DSL.
+
 ---
 
 ## Features (WIP)
@@ -39,6 +43,7 @@ It is:
 
 ```json
 {
+  "version": 1,
   "instructions": [
     {"op": "set", "key": "greeting", "value": "hello world"}
   ]
