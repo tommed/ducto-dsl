@@ -77,15 +77,14 @@ func Test_RunCLI(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var in bytes.Buffer
-			var out bytes.Buffer
-			var err bytes.Buffer
+			t.Parallel()
+			in, out, err := buf()
 
 			// Assemble
 			in.WriteString(tt.args.input)
 
 			// Act
-			code := RunCLI(tt.args.args, &in, &out, &err)
+			code := RunCLI(tt.args.args, in, out, err)
 
 			// Assert
 			assert.Equal(t, tt.want, code)
@@ -93,4 +92,8 @@ func Test_RunCLI(t *testing.T) {
 			assert.Contains(t, err.String(), tt.wantErrContains)
 		})
 	}
+}
+
+func buf() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer) {
+	return &bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{}
 }
