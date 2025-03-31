@@ -1,8 +1,7 @@
 package transform
 
 import (
-	"context"
-	"errors"
+	"fmt"
 	"github.com/tommed/dsl-transformer/internal/model"
 )
 
@@ -18,10 +17,14 @@ func (r *Registry) Register(op Operator) {
 	r.ops[op.Name()] = op
 }
 
-func (r *Registry) Apply(ctx context.Context, input map[string]interface{}, instr model.Instruction) error {
+func (r *Registry) Apply(ctx *ExecutionContext, input map[string]interface{}, instr model.Instruction) bool {
 	op, ok := r.ops[instr.Op]
 	if !ok {
-		return errors.New("unknown op: " + instr.Op)
+		return ctx.Handle(fmt.Errorf("unknown op: %q", instr.Op))
 	}
-	return op.Apply(ctx, input, instr)
+	err := op.Apply(ctx, input, instr)
+	if err != nil {
+		return ctx.Handle(err)
+	}
+	return true
 }

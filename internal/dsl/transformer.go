@@ -2,6 +2,7 @@ package dsl
 
 import (
 	"context"
+	"errors"
 	"github.com/tommed/dsl-transformer/internal/model"
 	"github.com/tommed/dsl-transformer/internal/transform"
 )
@@ -29,10 +30,19 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 		output[k] = v
 	}
 
+	// Create a new context
+	exec := transform.NewExecutionContext(prog.OnError)
+
+	// Apply instructions
 	for _, instr := range prog.Instructions {
-		if err := t.reg.Apply(ctx, output, instr); err != nil {
-			return nil, err
+		if !t.reg.Apply(exec, output, instr) {
+			return nil, errors.New("execution halted on error")
 		}
+	}
+
+	// Handle errors
+	if exec.OnError == "error" && len(exec.Errors) > 0 {
+		output["@dsl_errors"] = exec.Errors
 	}
 
 	return output, nil

@@ -35,6 +35,7 @@ func TestTransformer_Apply_InvalidOp(t *testing.T) {
 	input := map[string]interface{}{"foo": "bar"}
 
 	prog := &model.Program{
+		OnError: "fail",
 		Instructions: []model.Instruction{
 			{Op: "invalid-op", Key: "foo", Value: 2},
 		},
@@ -45,4 +46,26 @@ func TestTransformer_Apply_InvalidOp(t *testing.T) {
 
 	// Assert
 	assert.Error(t, err)
+}
+
+func TestTransformer_Apply_ErrorsReturned(t *testing.T) {
+	// Assemble
+	tr := New()
+	input := map[string]interface{}{}
+
+	prog := &model.Program{
+		OnError: "error",
+		Instructions: []model.Instruction{
+			{Op: ""},
+		},
+	}
+
+	// Act
+	output, err := tr.Apply(context.Background(), input, prog)
+
+	// Assert
+	assert.NoError(t, err) // should have been ignored due to OnError value
+	errorList, ok := output["@dsl_errors"].([]error)
+	assert.True(t, ok)
+	assert.Len(t, errorList, 1)
 }

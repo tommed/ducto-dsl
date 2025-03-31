@@ -1,7 +1,6 @@
 package transform
 
 import (
-	"context"
 	"errors"
 
 	"github.com/tommed/dsl-transformer/internal/model"
@@ -11,7 +10,7 @@ type CopyOperator struct{}
 
 func (c *CopyOperator) Name() string { return "copy" }
 
-func (c *CopyOperator) Apply(_ context.Context, input map[string]interface{}, instr model.Instruction) error {
+func (c *CopyOperator) Apply(ctx *ExecutionContext, input map[string]interface{}, instr model.Instruction) error {
 	if instr.From == "" {
 		return errors.New("copy op missing or invalid from")
 	}
