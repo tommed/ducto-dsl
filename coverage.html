@@ -83,7 +83,7 @@
 				
 				<option value="file13">github.com/tommed/dsl-transformer/internal/transform/op_set.go (100.0%)</option>
 				
-				<option value="file14">github.com/tommed/dsl-transformer/internal/transform/registry.go (95.0%)</option>
+				<option value="file14">github.com/tommed/dsl-transformer/internal/transform/registry.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -383,7 +383,7 @@ func (n NoOperation) Validate(instr model.Instruction) error <span class="cov1" 
         return nil
 }</span>
 
-func (n NoOperation) Name() string <span class="cov10" title="12">{
+func (n NoOperation) Name() string <span class="cov10" title="9">{
         return "noop"
 }</span>
 
@@ -606,21 +606,24 @@ func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov4" title
         <span class="cov4" title="5">return reg</span>
 }
 
-func NewRegistry() *Registry <span class="cov7" title="23">{
+func NewRegistry() *Registry <span class="cov7" title="25">{
         return &amp;Registry{ops: map[string]Operator{}}
 }</span>
 
-func (r *Registry) Register(op Operator) <span class="cov10" title="75">{
-        r.ops[op.Name()] = op
-}</span>
+func (r *Registry) Register(op Operator) <span class="cov10" title="78">{
+        name := op.Name()
+        if name == "" </span><span class="cov1" title="1">{
+                panic("operator has no name")</span>
+        }
+        <span class="cov9" title="77">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
+                panic(fmt.Sprintf("operator with name '%s' is already registered", name))</span>
+        }
+        <span class="cov9" title="76">r.ops[name] = op</span>
+}
 
 func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool <span class="cov4" title="5">{
-        op, ok := r.ops[instr.Op]
-        if !ok </span><span class="cov0" title="0">{
-                return ctx.HandleError(fmt.Errorf("unknown op: %q", instr.Op))
-        }</span>
-
-        <span class="cov4" title="5">if err := op.Apply(ctx, reg, input, instr); err != nil </span><span class="cov2" title="2">{
+        op := r.ops[instr.Op]
+        if err := op.Apply(ctx, reg, input, instr); err != nil </span><span class="cov2" title="2">{
                 return ctx.HandleError(err)
         }</span>
 

@@ -7,6 +7,41 @@ import (
 	"testing"
 )
 
+func TestRegistry_Register_DuplicatePanics(t *testing.T) {
+	reg := NewRegistry()
+	dummy := &NoOperation{}
+
+	// Register once (should not panic)
+	reg.Register(dummy)
+
+	// Register again (should panic)
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fatal("expected panic due to duplicate registration, got none")
+		} else {
+			t.Logf("panic caught as expected: %v", r)
+		}
+	}()
+
+	reg.Register(dummy) // <- this triggers panic
+}
+
+func TestRegistry_Register_NoNameOperatorFails(t *testing.T) {
+	reg := NewRegistry()
+	badOp := &noNameOperator{}
+
+	// Register again (should panic)
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fatal("expected panic due to duplicate registration, got none")
+		} else {
+			t.Logf("panic caught as expected: %v", r)
+		}
+	}()
+
+	reg.Register(badOp) // <- this triggers panic
+}
+
 func TestRegistry_Apply(t *testing.T) {
 	type args struct {
 		onError string
@@ -88,7 +123,7 @@ func TestRegistry_Apply(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			exec := NewExecutionContext(context.Background(), tt.args.onError)
-			r := NewDefaultRegistry(&NoOperation{})
+			r := NewDefaultRegistry(&fakeOperator{})
 			err := r.Find("set").Validate(tt.args.instr)
 			wantSuccess := false
 			if err == nil {
