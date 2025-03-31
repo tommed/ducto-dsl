@@ -132,7 +132,7 @@ import (
 //goland:noinspection GoUnhandledErrorResult
 func LintCommand(args []string) int <span class="cov10" title="5">{
         if len(args) &lt; 1 </span><span class="cov1" title="1">{
-                fmt.Fprintln(os.Stderr, "usage: ducto lint &lt;program.json&gt;")
+                fmt.Fprintln(os.Stderr, "usage: ducto-dsl lint &lt;program.json&gt;")
                 return 1
         }</span>
 
@@ -175,7 +175,7 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span 
 
         // Pre-Guards
         if len(args) &lt; 1 </span><span class="cov1" title="1">{
-                fmt.Fprintln(stderr, "usage: transformer-cli &lt;program.json&gt;")
+                fmt.Fprintln(stderr, "usage: ducto-dsl &lt;program.json&gt;")
                 return 1
         }</span>
 
