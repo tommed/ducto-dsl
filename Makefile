@@ -3,6 +3,7 @@
 # ----------------------
 
 COVERAGE_OUT=coverage.out
+COVERAGE_HTML=coverage.html
 GO=go
 LINTER=golangci-lint
 LINTER_REMOTE=github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -12,7 +13,7 @@ LINTER_OPTS=--timeout=2m
 # General Targets
 # ----------------------
 
-.PHONY: all check ci lint test test-full coverage example-simplest clean cli-macos example-map
+.PHONY: all check ci lint test test-full coverage example-simplest clean example-map ducto-dsl ducto-dsl.exe
 
 all: check
 
@@ -21,7 +22,7 @@ check: lint test-full coverage
 ci: check example-simplest example-map ducto-dsl ducto-dsl.exe
 
 clean:
-	@rm -f $(COVERAGE_OUT) coverage.html cli-macos
+	@rm -f $(COVERAGE_OUT) $(COVERAGE_HTML) ducto-dsl*
 
 # ----------------------
 # Linting
@@ -50,7 +51,7 @@ test-full:
 
 coverage:
 	@echo "==> Generating coverage HTML report"
-	$(GO) tool cover -html=$(COVERAGE_OUT) -o coverage.html
+	$(GO) tool cover -html=$(COVERAGE_OUT) -o $(COVERAGE_HTML)
 
 # ----------------------
 # CLI
