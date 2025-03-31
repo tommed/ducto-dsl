@@ -4,7 +4,7 @@ Ducto DSL Transformations are versioned for obvious reasons. Here are the versio
 
 ## 🟣 Latest Draft
 
-- [Draft v1](./spec-v1)
+- [Draft v1](./spec-v1.md)
 
 ## 🟢 Latest Stable
 
