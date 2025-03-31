@@ -65,7 +65,7 @@ func TestTransformer_Apply_ErrorsReturned(t *testing.T) {
 
 	// Assert
 	assert.NoError(t, err) // should have been ignored due to OnError value
-	errorList, ok := output["@dsl_errors"].([]error)
+	errorList, ok := output["@dsl_errors"].([]string)
 	assert.True(t, ok)
 	assert.Len(t, errorList, 1)
 }

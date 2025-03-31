@@ -227,8 +227,8 @@ import (
 type ExecutionContext struct {
         Ctx context.Context
 
-        OnError string  // "ignore", "fail", "error"
-        Errors  []error // Collected if OnError = "error"
+        OnError string   // "ignore", "fail", "error"
+        Errors  []string // Collected if OnError = "error"
 }
 
 func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="25">{
@@ -239,7 +239,7 @@ func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext 
         <span class="cov10" title="25">return &amp;ExecutionContext{
                 Ctx:     ctx,
                 OnError: onError,
-                Errors:  []error{},
+                Errors:  []string{},
         }</span>
 }
 
@@ -252,7 +252,7 @@ func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov6" titl
         case "fail":<span class="cov4" title="3">
                 return false</span>
         case "error":<span class="cov1" title="1">
-                ctx.Errors = append(ctx.Errors, err)
+                ctx.Errors = append(ctx.Errors, err.Error())
                 return true</span>
         case "ignore":<span class="cov1" title="1">
                 return true</span>

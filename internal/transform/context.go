@@ -7,8 +7,8 @@ import (
 type ExecutionContext struct {
 	Ctx context.Context
 
-	OnError string  // "ignore", "fail", "error"
-	Errors  []error // Collected if OnError = "error"
+	OnError string   // "ignore", "fail", "error"
+	Errors  []string // Collected if OnError = "error"
 }
 
 func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext {
@@ -19,7 +19,7 @@ func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext 
 	return &ExecutionContext{
 		Ctx:     ctx,
 		OnError: onError,
-		Errors:  []error{},
+		Errors:  []string{},
 	}
 }
 
@@ -32,7 +32,7 @@ func (ctx *ExecutionContext) HandleError(err error) bool {
 	case "fail":
 		return false
 	case "error":
-		ctx.Errors = append(ctx.Errors, err)
+		ctx.Errors = append(ctx.Errors, err.Error())
 		return true
 	case "ignore":
 		return true
