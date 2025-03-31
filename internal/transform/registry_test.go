@@ -61,14 +61,28 @@ func TestRegistry_Apply(t *testing.T) {
 		{
 			name: "invalid op + error",
 			args: args{
-				onError: "error",
+				onError: "capture",
 				input:   map[string]interface{}{},
 				instr: model.Instruction{
 					Op: "invalid_op",
 				},
 			},
-			wantSuccess: true, // ignored and continued
-			wantErrors:  []string{`unknown op: "invalid_op"`},
+			wantSuccess: false, // because this is validated not run on `apply`
+			wantErrors:  []string{},
+		},
+		{
+			name: "invalid at runtime (Apply)",
+			args: args{
+				onError: "fail",
+				input:   map[string]interface{}{},
+				instr: model.Instruction{
+					Op:   "map",
+					Key:  "a", // doesn't exist on input
+					Then: []model.Instruction{{Op: "noop"}},
+				},
+			},
+			wantSuccess: false, // because this is validated not run on `apply`
+			wantErrors:  []string{},
 		},
 	}
 	for _, tt := range tests {
@@ -76,7 +90,12 @@ func TestRegistry_Apply(t *testing.T) {
 			exec := NewExecutionContext(context.Background(), tt.args.onError)
 			r := NewRegistry()
 			r.Register(&SetOperator{})
-			assert.Equalf(t, tt.wantSuccess, r.Apply(exec, r, tt.args.input, tt.args.instr), "Apply(ctx, %v, %v)", tt.args.input, tt.args.instr)
+			err := r.Find("set").Validate(tt.args.instr)
+			wantSuccess := false
+			if err == nil {
+				wantSuccess = r.Apply(exec, r, tt.args.input, tt.args.instr)
+			}
+			assert.Equalf(t, tt.wantSuccess, wantSuccess, "Apply(ctx, %v, %v)", tt.args.input, tt.args.instr)
 			assert.Equal(t, tt.wantErrors, exec.Errors)
 		})
 	}

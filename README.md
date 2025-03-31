@@ -1,3 +1,4 @@
+<!--suppress HtmlDeprecatedAttribute -->
 <p align="right">
     <a href="https://github.com/tommed" title="See Project Ducto">
         <img src="./assets/ducto-logo-small.png" alt="A part of Project Ducto"/>
@@ -14,7 +15,8 @@
 ## About
 
 <p align="center">
-  <img src="./assets/ducto-representation-small.png"/>
+  <img alt="Graphical representation of Ducto manipulate streaming data in a system of pipes" 
+       src="./assets/ducto-representation-small.png"/>
 </p>
 
 `dsl-transformer` is a lightweight, embeddable data transformation engine designed for structured data (JSON, maps, structs). Transformations are defined using a DSL (JSON or HCL-based), making it suitable for use cases like:
@@ -35,16 +37,18 @@ It is:
 
 ## DSL Specification
 
-See [SPEC.md](./SPEC.md) for a specification of the DSL.
+See [doc/SPEC.md](docs/specs) for a specification of the DSL.
 
 ---
 
 ## Features (WIP)
+- [x] CLI for local testing
 - [x] Declarative `set` and `copy` operations
-- [ ] Support for `map`, `delete`, `merge`
+- [x] Support for `map`, `delete`, `merge`
 - [ ] Conditionals
-- [ ] CLI for local testing
+- [ ] Validator and Linter included
 - [ ] Embeddable Go SDK
+- [ ] Input can be JSON or YAML
 - [ ] HCL-powered syntax option
 - [ ] Serverless runtime compatibility
 - [ ] OpenTelemetry instrumentation
@@ -100,7 +104,7 @@ make cli-macos
 
 ## Status
 
-See [status.md](./status.md) for up-to-date CI, coverage, and project health.
+See [status.md](docs/status.md) for up-to-date CI, coverage, and project health.
 
 ## License
 

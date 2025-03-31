@@ -5,6 +5,10 @@ import "github.com/tommed/dsl-transformer/internal/model"
 // NoOperation is our nil implementation, it literally does nothing and never fails
 type NoOperation struct{}
 
+func (n NoOperation) Validate(instr model.Instruction) error {
+	return nil
+}
+
 func (n NoOperation) Name() string {
 	return "noop"
 }

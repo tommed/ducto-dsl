@@ -23,7 +23,8 @@ func TestMapOperator_Apply(t *testing.T) {
 			name: "no key",
 			args: args{
 				instr: model.Instruction{
-					Op: "map",
+					Op:  "map",
+					Key: "",
 				},
 			},
 			wantErr: errors.New("map operator requires 'key' field"),
@@ -32,8 +33,9 @@ func TestMapOperator_Apply(t *testing.T) {
 			name: "no then",
 			args: args{
 				instr: model.Instruction{
-					Op:  "map",
-					Key: "a",
+					Op:   "map",
+					Key:  "a",
+					Then: []model.Instruction{},
 				},
 			},
 			wantErr: errors.New("map operator requires at least one instruction in 'then'"),
@@ -131,8 +133,11 @@ func TestMapOperator_Apply(t *testing.T) {
 			r.Register(mapOp)
 			r.Register(&SetOperator{})
 			r.Register(&FailOperator{})
-			err := mapOp.Apply(exec, r, input, tt.args.instr)
-			assert.Equal(t, err, tt.wantErr)
+			err := mapOp.Validate(tt.args.instr)
+			if err == nil {
+				err = mapOp.Apply(exec, r, input, tt.args.instr)
+			}
+			assert.Equal(t, tt.wantErr, err)
 			if tt.wantErr == nil && err != nil {
 				assert.NoError(t, err)
 			}

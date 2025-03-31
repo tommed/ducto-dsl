@@ -40,6 +40,13 @@ func TestNewExecutionContext_HandleError(t *testing.T) {
 			},
 			wantSuccess: true, // ignored error
 		},
+		{
+			name: "capture means success regardless",
+			args: args{
+				onError: "capture",
+			},
+			wantSuccess: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "on_error": "error",
+  "on_error": "capture",
   "instructions": [
     {
       "op": "map",

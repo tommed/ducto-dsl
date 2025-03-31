@@ -7,12 +7,12 @@ import (
 type ExecutionContext struct {
 	Ctx context.Context
 
-	OnError string   // "ignore", "fail", "error"
-	Errors  []string // Collected if OnError = "error"
+	OnError string   // "ignore", "fail", "capture"
+	Errors  []string // Collected if OnError = "capture"
 }
 
 func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext {
-	if onError != "ignore" && onError != "fail" && onError != "error" {
+	if onError != "ignore" && onError != "fail" && onError != "capture" {
 		onError = "ignore"
 	}
 
@@ -31,7 +31,7 @@ func (ctx *ExecutionContext) HandleError(err error) bool {
 	switch ctx.OnError {
 	case "fail":
 		return false
-	case "error":
+	case "capture":
 		ctx.Errors = append(ctx.Errors, err.Error())
 		return true
 	case "ignore":

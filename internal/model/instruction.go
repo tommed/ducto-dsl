@@ -1,5 +1,11 @@
 package model
 
+type Program struct {
+	Version      int           `json:"version"`
+	OnError      string        `json:"on_error,omitempty"`
+	Instructions []Instruction `json:"instructions"`
+}
+
 type Instruction struct {
 	Op string `json:"op"`
 
@@ -18,11 +24,7 @@ type Instruction struct {
 	Condition map[string]interface{} `json:"condition,omitempty"`
 	Not       bool                   `json:"not,omitempty"`
 	Then      []Instruction          `json:"then,omitempty"`
+	IfNotSet  bool                   `json:"if_not_set,omitempty"`
 
 	// Others will be added as needed
-}
-
-type Program struct {
-	OnError      string        `json:"on_error,omitempty"`
-	Instructions []Instruction `json:"instructions"`
 }

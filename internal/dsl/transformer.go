@@ -18,23 +18,29 @@ func New() *Transformer {
 	reg.Register(&transform.SetOperator{})
 	reg.Register(&transform.CopyOperator{})
 	reg.Register(&transform.DeleteOperator{})
-	reg.Register(&transform.MapOperator{})
-	reg.Register(&transform.FailOperator{})
 	reg.Register(&transform.NoOperation{})
+	reg.Register(&transform.FailOperator{})
+	reg.Register(&transform.MapOperator{})
+	reg.Register(&transform.MergeOperator{})
 	return &Transformer{reg: reg}
 }
 
 // Apply applies the given transformation definition
 func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *model.Program) (map[string]interface{}, error) {
 
+	// Validate program before execution
+	if err := ValidateProgram(t.reg, prog); err != nil {
+		return nil, err
+	}
+
+	// Create a new context
+	exec := transform.NewExecutionContext(ctx, prog.OnError)
+
 	// Create our output, start with the input values
 	output := make(map[string]interface{})
 	for k, v := range input {
 		output[k] = v
 	}
-
-	// Create a new context
-	exec := transform.NewExecutionContext(ctx, prog.OnError)
 
 	// Apply instructions
 	for _, instr := range prog.Instructions {
@@ -44,7 +50,7 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 	}
 
 	// HandleError errors
-	if exec.OnError == "error" && len(exec.Errors) > 0 {
+	if exec.OnError == "capture" && len(exec.Errors) > 0 {
 		output["@dsl_errors"] = exec.Errors
 	}
 
