@@ -57,29 +57,33 @@
 				
 				<option value="file0">github.com/tommed/dsl-transformer/cmd/transformer-cli/main.go (0.0%)</option>
 				
-				<option value="file1">github.com/tommed/dsl-transformer/internal/cli/runner.go (100.0%)</option>
+				<option value="file1">github.com/tommed/dsl-transformer/internal/cli/lint.go (100.0%)</option>
 				
-				<option value="file2">github.com/tommed/dsl-transformer/internal/dsl/transformer.go (100.0%)</option>
+				<option value="file2">github.com/tommed/dsl-transformer/internal/cli/runner.go (100.0%)</option>
 				
-				<option value="file3">github.com/tommed/dsl-transformer/internal/dsl/validate.go (100.0%)</option>
+				<option value="file3">github.com/tommed/dsl-transformer/internal/cli/transform.go (100.0%)</option>
 				
-				<option value="file4">github.com/tommed/dsl-transformer/internal/transform/context.go (100.0%)</option>
+				<option value="file4">github.com/tommed/dsl-transformer/internal/dsl/transformer.go (100.0%)</option>
 				
-				<option value="file5">github.com/tommed/dsl-transformer/internal/transform/noop.go (100.0%)</option>
+				<option value="file5">github.com/tommed/dsl-transformer/internal/dsl/validate.go (100.0%)</option>
 				
-				<option value="file6">github.com/tommed/dsl-transformer/internal/transform/op_copy.go (100.0%)</option>
+				<option value="file6">github.com/tommed/dsl-transformer/internal/transform/context.go (100.0%)</option>
 				
-				<option value="file7">github.com/tommed/dsl-transformer/internal/transform/op_delete.go (100.0%)</option>
+				<option value="file7">github.com/tommed/dsl-transformer/internal/transform/noop.go (100.0%)</option>
 				
-				<option value="file8">github.com/tommed/dsl-transformer/internal/transform/op_fail.go (100.0%)</option>
+				<option value="file8">github.com/tommed/dsl-transformer/internal/transform/op_copy.go (100.0%)</option>
 				
-				<option value="file9">github.com/tommed/dsl-transformer/internal/transform/op_map.go (100.0%)</option>
+				<option value="file9">github.com/tommed/dsl-transformer/internal/transform/op_delete.go (100.0%)</option>
 				
-				<option value="file10">github.com/tommed/dsl-transformer/internal/transform/op_merge.go (100.0%)</option>
+				<option value="file10">github.com/tommed/dsl-transformer/internal/transform/op_fail.go (100.0%)</option>
 				
-				<option value="file11">github.com/tommed/dsl-transformer/internal/transform/op_set.go (100.0%)</option>
+				<option value="file11">github.com/tommed/dsl-transformer/internal/transform/op_map.go (100.0%)</option>
 				
-				<option value="file12">github.com/tommed/dsl-transformer/internal/transform/registry.go (100.0%)</option>
+				<option value="file12">github.com/tommed/dsl-transformer/internal/transform/op_merge.go (100.0%)</option>
+				
+				<option value="file13">github.com/tommed/dsl-transformer/internal/transform/op_set.go (100.0%)</option>
+				
+				<option value="file14">github.com/tommed/dsl-transformer/internal/transform/registry.go (95.0%)</option>
 				
 				</select>
 			</div>
@@ -117,18 +121,57 @@ func main() <span class="cov0" title="0">{
 		<pre class="file" id="file1" style="display: none">package cli
 
 import (
-        "context"
         "encoding/json"
         "fmt"
-        "github.com/tommed/dsl-transformer/internal/model"
-        "io"
-        "os"
-
         "github.com/tommed/dsl-transformer/internal/dsl"
+        "github.com/tommed/dsl-transformer/internal/model"
+        "github.com/tommed/dsl-transformer/internal/transform"
+        "os"
 )
 
 //goland:noinspection GoUnhandledErrorResult
-func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span class="cov10" title="7">{
+func LintCommand(args []string) int <span class="cov10" title="5">{
+        if len(args) &lt; 1 </span><span class="cov1" title="1">{
+                fmt.Fprintln(os.Stderr, "usage: ducto lint &lt;program.json&gt;")
+                return 1
+        }</span>
+
+        // Load file
+        <span class="cov8" title="4">programFile := args[0]
+        data, err := os.ReadFile(programFile)
+        if err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(os.Stderr, "failed to read %s: %v\n", programFile, err)
+                return 1
+        }</span>
+
+        // Parse JSON
+        <span class="cov7" title="3">var prog model.Program
+        if err := json.Unmarshal(data, &amp;prog); err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(os.Stderr, "invalid JSON: %v\n", err)
+                return 1
+        }</span>
+
+        // Validate program
+        <span class="cov4" title="2">reg := transform.NewDefaultRegistry()
+        if err := dsl.ValidateProgram(reg, &amp;prog); err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(os.Stderr, "program validation failed: %v\n", err)
+                return 1
+        }</span>
+
+        <span class="cov1" title="1">fmt.Println("Program is valid ✅")
+        return 0</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package cli
+
+import (
+        "fmt"
+        "io"
+)
+
+//goland:noinspection GoUnhandledErrorResult
+func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span class="cov10" title="12">{
 
         // Pre-Guards
         if len(args) &lt; 1 </span><span class="cov1" title="1">{
@@ -136,13 +179,36 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span 
                 return 1
         }</span>
 
-        <span class="cov9" title="6">progData, err := os.ReadFile(args[0])
+        <span class="cov9" title="11">switch args[0] </span>{
+        case "lint":<span class="cov6" title="5">
+                return LintCommand(args[1:])</span>
+        default:<span class="cov7" title="6">
+                return TransformCommand(args, stdin, stdout, stderr)</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package cli
+
+import (
+        "context"
+        "encoding/json"
+        "fmt"
+        "github.com/tommed/dsl-transformer/internal/dsl"
+        "github.com/tommed/dsl-transformer/internal/model"
+        "io"
+        "os"
+)
+
+//goland:noinspection GoUnhandledErrorResult
+func TransformCommand(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int <span class="cov10" title="6">{
+        progData, err := os.ReadFile(args[0])
         if err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "failed to read program file: %v\n", err)
                 return 1
         }</span>
 
-        <span class="cov8" title="5">var prog model.Program
+        <span class="cov9" title="5">var prog model.Program
         if err := json.Unmarshal(progData, &amp;prog); err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "failed to parse program: %v\n", err)
                 return 1
@@ -168,7 +234,7 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span 
 }
 </pre>
 		
-		<pre class="file" id="file2" style="display: none">package dsl
+		<pre class="file" id="file4" style="display: none">package dsl
 
 import (
         "context"
@@ -184,14 +250,7 @@ type Transformer struct {
 
 // New creates a new Transformer
 func New() *Transformer <span class="cov10" title="8">{
-        reg := transform.NewRegistry()
-        reg.Register(&amp;transform.SetOperator{})
-        reg.Register(&amp;transform.CopyOperator{})
-        reg.Register(&amp;transform.DeleteOperator{})
-        reg.Register(&amp;transform.NoOperation{})
-        reg.Register(&amp;transform.FailOperator{})
-        reg.Register(&amp;transform.MapOperator{})
-        reg.Register(&amp;transform.MergeOperator{})
+        reg := transform.NewDefaultRegistry()
         return &amp;Transformer{reg: reg}
 }</span>
 
@@ -228,7 +287,7 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 }
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package dsl
+		<pre class="file" id="file5" style="display: none">package dsl
 
 import (
         "fmt"
@@ -269,7 +328,7 @@ func ValidateProgram(r *transform.Registry, prog *model.Program) error <span cla
 }
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package transform
+		<pre class="file" id="file6" style="display: none">package transform
 
 import (
         "context"
@@ -313,7 +372,7 @@ func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov5" titl
 }
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package transform
+		<pre class="file" id="file7" style="display: none">package transform
 
 import "github.com/tommed/dsl-transformer/internal/model"
 
@@ -324,7 +383,7 @@ func (n NoOperation) Validate(instr model.Instruction) error <span class="cov1" 
         return nil
 }</span>
 
-func (n NoOperation) Name() string <span class="cov10" title="2">{
+func (n NoOperation) Name() string <span class="cov10" title="12">{
         return "noop"
 }</span>
 
@@ -333,7 +392,7 @@ func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interf
 }</span>
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">package transform
+		<pre class="file" id="file8" style="display: none">package transform
 
 import (
         "errors"
@@ -342,17 +401,17 @@ import (
 
 type CopyOperator struct{}
 
-func (c *CopyOperator) Validate(instr model.Instruction) error <span class="cov8" title="3">{
+func (c *CopyOperator) Validate(instr model.Instruction) error <span class="cov5" title="3">{
         if instr.From == "" </span><span class="cov1" title="1">{
                 return errors.New("copy op missing or invalid from")
         }</span>
-        <span class="cov5" title="2">if instr.To == "" </span><span class="cov1" title="1">{
+        <span class="cov3" title="2">if instr.To == "" </span><span class="cov1" title="1">{
                 return errors.New("copy op missing or invalid to")
         }</span>
         <span class="cov1" title="1">return nil</span>
 }
 
-func (c *CopyOperator) Name() string <span class="cov10" title="4">{ return "copy" }</span>
+func (c *CopyOperator) Name() string <span class="cov10" title="9">{ return "copy" }</span>
 
 func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov1" title="1">{
         input[instr.To] = input[instr.From]
@@ -360,7 +419,7 @@ func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]
 }</span>
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">package transform
+		<pre class="file" id="file9" style="display: none">package transform
 
 import (
         "errors"
@@ -369,14 +428,14 @@ import (
 
 type DeleteOperator struct{}
 
-func (d *DeleteOperator) Validate(instr model.Instruction) error <span class="cov6" title="2">{
+func (d *DeleteOperator) Validate(instr model.Instruction) error <span class="cov4" title="2">{
         if instr.Key == "" </span><span class="cov1" title="1">{
                 return errors.New("delete operator missing 'key'")
         }</span>
         <span class="cov1" title="1">return nil</span>
 }
 
-func (d *DeleteOperator) Name() string <span class="cov10" title="3">{ return "delete" }</span>
+func (d *DeleteOperator) Name() string <span class="cov10" title="8">{ return "delete" }</span>
 
 func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov1" title="1">{
         delete(input, instr.Key)
@@ -384,7 +443,7 @@ func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[strin
 }</span>
 </pre>
 		
-		<pre class="file" id="file8" style="display: none">package transform
+		<pre class="file" id="file10" style="display: none">package transform
 
 import (
         "errors"
@@ -398,7 +457,7 @@ func (f FailOperator) Validate(instr model.Instruction) error <span class="cov1"
         return nil
 }</span>
 
-func (f FailOperator) Name() string <span class="cov10" title="8">{
+func (f FailOperator) Name() string <span class="cov10" title="13">{
         return "fail"
 }</span>
 
@@ -407,7 +466,7 @@ func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]inter
 }</span>
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">package transform
+		<pre class="file" id="file11" style="display: none">package transform
 
 import (
         "fmt"
@@ -416,39 +475,39 @@ import (
 
 type MapOperator struct{}
 
-func (o *MapOperator) Validate(instr model.Instruction) error <span class="cov9" title="9">{
+func (o *MapOperator) Validate(instr model.Instruction) error <span class="cov8" title="9">{
         if instr.Key == "" </span><span class="cov1" title="1">{
                 return fmt.Errorf("map operator requires 'key' field")
         }</span>
 
-        <span class="cov9" title="8">if len(instr.Then) == 0 </span><span class="cov1" title="1">{
+        <span class="cov7" title="8">if len(instr.Then) == 0 </span><span class="cov1" title="1">{
                 return fmt.Errorf("map operator requires at least one instruction in 'then'")
         }</span>
-        <span class="cov8" title="7">return nil</span>
+        <span class="cov7" title="7">return nil</span>
 }
 
-func (o *MapOperator) Name() string <span class="cov10" title="10">{
+func (o *MapOperator) Name() string <span class="cov10" title="15">{
         return "map"
 }</span>
 
-func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov8" title="7">{
+func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov7" title="8">{
         arrVal, ok := input[instr.Key]
-        if !ok </span><span class="cov1" title="1">{
+        if !ok </span><span class="cov3" title="2">{
                 return fmt.Errorf("map operator: key %q not found in input", instr.Key)
         }</span>
 
-        <span class="cov8" title="6">arr, ok := arrVal.([]interface{})
-        if !ok </span><span class="cov5" title="3">{
+        <span class="cov6" title="6">arr, ok := arrVal.([]interface{})
+        if !ok </span><span class="cov4" title="3">{
                 return fmt.Errorf("map operator: input[%q] is not an array", instr.Key)
         }</span>
 
-        <span class="cov5" title="3">for i, item := range arr </span><span class="cov6" title="4">{
+        <span class="cov4" title="3">for i, item := range arr </span><span class="cov5" title="4">{
                 itemMap, ok := item.(map[string]interface{})
                 if !ok </span><span class="cov1" title="1">{
                         return fmt.Errorf("map operator: array item at index %d is not an object", i)
                 }</span>
 
-                <span class="cov5" title="3">for _, subInstr := range instr.Then </span><span class="cov5" title="3">{
+                <span class="cov4" title="3">for _, subInstr := range instr.Then </span><span class="cov4" title="3">{
                         if !reg.Apply(ctx, reg, itemMap, subInstr) </span><span class="cov1" title="1">{
                                 return fmt.Errorf("map operator: sub-instruction failed at index %d", i)
                         }</span>
@@ -459,7 +518,7 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
 }
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package transform
+		<pre class="file" id="file12" style="display: none">package transform
 
 import (
         "fmt"
@@ -468,36 +527,36 @@ import (
 
 type MergeOperator struct{}
 
-func (o *MergeOperator) Name() string <span class="cov10" title="7">{
+func (o *MergeOperator) Name() string <span class="cov10" title="12">{
         return "merge"
 }</span>
 
-func (o *MergeOperator) Validate(instr model.Instruction) error <span class="cov9" title="6">{
+func (o *MergeOperator) Validate(instr model.Instruction) error <span class="cov7" title="6">{
         if instr.Value == nil </span><span class="cov1" title="1">{
                 return fmt.Errorf("merge operator missing 'value'")
         }</span>
-        <span class="cov8" title="5">if _, ok := instr.Value.(map[string]interface{}); !ok </span><span class="cov1" title="1">{
+        <span class="cov6" title="5">if _, ok := instr.Value.(map[string]interface{}); !ok </span><span class="cov1" title="1">{
                 return fmt.Errorf("merge operator: 'value' must be an object")
         }</span>
-        <span class="cov7" title="4">return nil</span>
+        <span class="cov6" title="4">return nil</span>
 }
 
-func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov7" title="4">{
-        for k, v := range instr.Value.(map[string]interface{}) </span><span class="cov8" title="5">{
+func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov6" title="4">{
+        for k, v := range instr.Value.(map[string]interface{}) </span><span class="cov6" title="5">{
                 // If `if_not_set` is true, only set if missing
-                if instr.IfNotSet </span><span class="cov6" title="3">{
+                if instr.IfNotSet </span><span class="cov4" title="3">{
                         if _, exists := input[k]; exists </span><span class="cov1" title="1">{
                                 continue</span>
                         }
                 }
-                <span class="cov7" title="4">input[k] = v</span>
+                <span class="cov6" title="4">input[k] = v</span>
         }
 
-        <span class="cov7" title="4">return nil</span>
+        <span class="cov6" title="4">return nil</span>
 }
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package transform
+		<pre class="file" id="file13" style="display: none">package transform
 
 import (
         "fmt"
@@ -521,7 +580,7 @@ func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]i
 }</span>
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package transform
+		<pre class="file" id="file14" style="display: none">package transform
 
 import (
         "fmt"
@@ -532,28 +591,43 @@ type Registry struct {
         ops map[string]Operator
 }
 
-func NewRegistry() *Registry <span class="cov8" title="23">{
+func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov4" title="5">{
+        reg := NewRegistry()
+        reg.Register(&amp;SetOperator{})
+        reg.Register(&amp;CopyOperator{})
+        reg.Register(&amp;DeleteOperator{})
+        reg.Register(&amp;MapOperator{})
+        reg.Register(&amp;FailOperator{})
+        reg.Register(&amp;NoOperation{})
+        reg.Register(&amp;MergeOperator{})
+        for _, op := range optional </span><span class="cov4" title="5">{
+                reg.Register(op)
+        }</span>
+        <span class="cov4" title="5">return reg</span>
+}
+
+func NewRegistry() *Registry <span class="cov7" title="23">{
         return &amp;Registry{ops: map[string]Operator{}}
 }</span>
 
-func (r *Registry) Register(op Operator) <span class="cov10" title="40">{
+func (r *Registry) Register(op Operator) <span class="cov10" title="75">{
         r.ops[op.Name()] = op
 }</span>
 
 func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool <span class="cov4" title="5">{
         op, ok := r.ops[instr.Op]
-        if !ok </span><span class="cov1" title="1">{
+        if !ok </span><span class="cov0" title="0">{
                 return ctx.HandleError(fmt.Errorf("unknown op: %q", instr.Op))
         }</span>
 
-        <span class="cov4" title="4">if err := op.Apply(ctx, reg, input, instr); err != nil </span><span class="cov1" title="1">{
+        <span class="cov4" title="5">if err := op.Apply(ctx, reg, input, instr); err != nil </span><span class="cov2" title="2">{
                 return ctx.HandleError(err)
         }</span>
 
         <span class="cov3" title="3">return true</span>
 }
 
-func (r *Registry) Find(op string) Operator <span class="cov6" title="11">{
+func (r *Registry) Find(op string) Operator <span class="cov5" title="11">{
         return r.ops[op]
 }</span>
 </pre>

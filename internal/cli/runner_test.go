@@ -104,6 +104,63 @@ func Test_RunCLI(t *testing.T) {
 	}
 }
 
+func TestRunCLI_Lint(t *testing.T) {
+	type args struct {
+		filename string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "simplest",
+			args: args{
+				filename: "../../examples/simplest.json",
+			},
+			want: 0,
+		},
+		{
+			name: "invalid_op",
+			args: args{
+				filename: "../../test/data/invalid-op.json",
+			},
+			want: 1,
+		},
+		{
+			name: "invalid_file_path",
+			args: args{
+				filename: "../../test/data/invalid-file-path.json",
+			},
+			want: 1,
+		},
+		{
+			name: "invalid_file_path",
+			args: args{
+				filename: "../../test/data/invalid-json.json",
+			},
+			want: 1,
+		},
+		{
+			name: "no_file",
+			args: args{},
+			want: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			in, out, err := buf()
+			inputArgs := []string{"lint"}
+			if tt.args.filename != "" {
+				inputArgs = append(inputArgs, tt.args.filename)
+			}
+			exitCode := RunCLI(inputArgs, in, out, err)
+			assert.Equal(t, tt.want, exitCode)
+		})
+	}
+}
+
 func buf() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer) {
 	return &bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{}
 }

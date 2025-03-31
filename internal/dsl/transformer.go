@@ -14,14 +14,7 @@ type Transformer struct {
 
 // New creates a new Transformer
 func New() *Transformer {
-	reg := transform.NewRegistry()
-	reg.Register(&transform.SetOperator{})
-	reg.Register(&transform.CopyOperator{})
-	reg.Register(&transform.DeleteOperator{})
-	reg.Register(&transform.NoOperation{})
-	reg.Register(&transform.FailOperator{})
-	reg.Register(&transform.MapOperator{})
-	reg.Register(&transform.MergeOperator{})
+	reg := transform.NewDefaultRegistry()
 	return &Transformer{reg: reg}
 }
 
