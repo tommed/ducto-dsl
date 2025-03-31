@@ -1,3 +1,7 @@
+<div style="background-color: #faf0ea;border-top:8px solid #6E5BAA;color:#333">
+
+![Ducto Logo](./assets/ducto-logo-small.png)
+
 # DSL Transformer
 
 [![CI](https://github.com/tommed/dsl-transformer/actions/workflows/ci.yml/badge.svg)](https://github.com/tommed/dsl-transformer/actions/workflows/ci.yml)
@@ -91,3 +95,4 @@ See [status.md](./status.md) for up-to-date CI, coverage, and project health.
 ## License
 
 [MIT](./LICENSE)
+</div>
