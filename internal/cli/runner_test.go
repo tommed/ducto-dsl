@@ -9,6 +9,7 @@ import (
 
 func Test_RunCLI(t *testing.T) {
 	const goodInput = `{"foo":"bar"}`
+	const goodArrayInput = `{"items": [{}, {}]}`
 	type args struct {
 		input string
 		args  []string
@@ -73,6 +74,15 @@ func Test_RunCLI(t *testing.T) {
 			},
 			want:            1,
 			wantErrContains: "error:",
+		},
+		{
+			name: "map",
+			args: args{
+				input: goodArrayInput,
+				args:  []string{"../../examples/map.json"},
+			},
+			want:         0,
+			wantContains: `"status": "processed"`,
 		},
 	}
 	for _, tt := range tests {

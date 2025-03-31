@@ -77,7 +77,7 @@ func TestRegistry_Apply(t *testing.T) {
 			exec := NewExecutionContext(context.Background(), tt.args.onError)
 			r := NewRegistry()
 			r.Register(&SetOperator{})
-			assert.Equalf(t, tt.wantSuccess, r.Apply(exec, tt.args.input, tt.args.instr), "Apply(ctx, %v, %v)", tt.args.input, tt.args.instr)
+			assert.Equalf(t, tt.wantSuccess, r.Apply(exec, r, tt.args.input, tt.args.instr), "Apply(ctx, %v, %v)", tt.args.input, tt.args.instr)
 			assert.Equal(t, tt.wantErrors, exec.Errors)
 		})
 	}

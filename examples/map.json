@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "on_error": "error",
+  "instructions": [
+    {
+      "op": "map",
+      "key": "items",
+      "then": [
+        { "op": "set", "key": "status", "value": "processed" }
+      ]
+    }
+  ]
+}
