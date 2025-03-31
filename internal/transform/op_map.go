@@ -7,11 +7,7 @@ import (
 
 type MapOperator struct{}
 
-func (o *MapOperator) Name() string {
-	return "map"
-}
-
-func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error {
+func (o *MapOperator) Validate(instr model.Instruction) error {
 	if instr.Key == "" {
 		return fmt.Errorf("map operator requires 'key' field")
 	}
@@ -19,7 +15,14 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
 	if len(instr.Then) == 0 {
 		return fmt.Errorf("map operator requires at least one instruction in 'then'")
 	}
+	return nil
+}
 
+func (o *MapOperator) Name() string {
+	return "map"
+}
+
+func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error {
 	arrVal, ok := input[instr.Key]
 	if !ok {
 		return fmt.Errorf("map operator: key %q not found in input", instr.Key)

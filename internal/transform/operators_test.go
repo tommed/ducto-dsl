@@ -103,7 +103,12 @@ func TestOperators(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.expectedName, tt.op.Name())
-			err := tt.op.Apply(exec, r, input, tt.instr)
+
+			err := tt.op.Validate(tt.instr)
+			if err == nil {
+				err = tt.op.Apply(exec, r, input, tt.instr)
+			}
+			
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -125,13 +130,13 @@ func TestOperators_ValidationErrors(t *testing.T) {
 			name:        "set_no_key",
 			op:          &SetOperator{},
 			instruction: model.Instruction{},
-			wantErr:     "missing key",
+			wantErr:     "operator missing 'key'",
 		},
 		{
 			name:        "delete_no_key",
 			op:          &DeleteOperator{},
 			instruction: model.Instruction{},
-			wantErr:     "missing key",
+			wantErr:     "operator missing 'key'",
 		},
 		{
 			name:        "copy_no_from",
@@ -153,7 +158,13 @@ func TestOperators_ValidationErrors(t *testing.T) {
 			r := NewRegistry() // only needed for nested ops like `if`, `map` etc.
 			r.Register(tt.op)
 
-			err := tt.op.Apply(exec, r, map[string]interface{}{}, tt.instruction)
+			// Determine which error we're looking for:
+			// Validation or Application errors
+			err := tt.op.Validate(tt.instruction)
+			if err == nil {
+				err = tt.op.Apply(exec, r, map[string]interface{}{}, tt.instruction)
+			}
+
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), tt.wantErr)
 		})

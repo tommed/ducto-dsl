@@ -29,3 +29,7 @@ func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]
 
 	return true
 }
+
+func (r *Registry) Find(op string) Operator {
+	return r.ops[op]
+}
