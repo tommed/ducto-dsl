@@ -1,4 +1,6 @@
-![Ducto Logo](./assets/ducto-logo-small.png)
+<a href="https://github.com/tommed" title="See Project Ducto">
+    <img src="./assets/ducto-logo-small.png" alt="A part of Project Ducto"/>
+</a>
 
 # DSL Transformer
 
@@ -8,6 +10,10 @@
 ---
 
 ## About
+
+<p align="center">
+  <img src="./assets/ducto-representation-small.png"/>
+</p>
 
 `dsl-transformer` is a lightweight, embeddable data transformation engine designed for structured data (JSON, maps, structs). Transformations are defined using a DSL (JSON or HCL-based), making it suitable for use cases like:
 
@@ -20,6 +26,10 @@ It is:
 - ⚡ Minimal
 - 🟣 Composable
 - 🟩 Fully testable
+
+`dsl-transformer` is a part of the larger Ducto project, combining many interesting practices together including Feature Flagging.
+
+![Topology Diagram](./assets/topology-medium.png)
 
 ## DSL Specification
 
