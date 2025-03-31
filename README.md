@@ -29,7 +29,7 @@ It is:
 - 🟣 Composable
 - 🟩 Fully testable
 
-`dsl-transformer` is a part of the larger Ducto project, combining many interesting practices together including Feature Flagging.
+`dsl-transformer` is a part of the larger [Ducto project](https://github.com/tommed), combining many interesting practices together including Feature Flagging.
 
 ![Topology Diagram](./assets/topology-medium.png)
 
