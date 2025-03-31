@@ -20,9 +20,7 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return 1
 	}
 
-	progFile := args[0]
-
-	progData, err := os.ReadFile(progFile)
+	progData, err := os.ReadFile(args[0])
 	if err != nil {
 		fmt.Fprintf(stderr, "failed to read program file: %v\n", err)
 		return 1

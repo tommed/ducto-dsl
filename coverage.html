@@ -126,9 +126,7 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span 
                 return 1
         }</span>
 
-        <span class="cov9" title="5">progFile := args[0]
-
-        progData, err := os.ReadFile(progFile)
+        <span class="cov9" title="5">progData, err := os.ReadFile(args[0])
         if err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "failed to read program file: %v\n", err)
                 return 1
@@ -193,16 +191,16 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
         }</span>
 
         // Create a new context
-        <span class="cov10" title="3">exec := transform.NewExecutionContext(prog.OnError)
+        <span class="cov10" title="3">exec := transform.NewExecutionContext(ctx, prog.OnError)
 
         // Apply instructions
         for _, instr := range prog.Instructions </span><span class="cov10" title="3">{
                 if !t.reg.Apply(exec, output, instr) </span><span class="cov1" title="1">{
-                        return nil, errors.New("execution halted on error")
+                        return nil, errors.New("execution halted due to an error")
                 }</span>
         }
 
-        // Handle errors
+        // HandleError errors
         <span class="cov6" title="2">if exec.OnError == "error" &amp;&amp; len(exec.Errors) &gt; 0 </span><span class="cov1" title="1">{
                 output["@dsl_errors"] = exec.Errors
         }</span>
@@ -213,20 +211,35 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 		
 		<pre class="file" id="file3" style="display: none">package transform
 
+import (
+        "context"
+)
+
 type ExecutionContext struct {
+        Ctx context.Context
+
         OnError string  // "ignore", "fail", "error"
         Errors  []error // Collected if OnError = "error"
 }
 
-func NewExecutionContext(onError string) *ExecutionContext <span class="cov10" title="14">{
-        if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "error" </span><span class="cov3" title="2">{
+func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="15">{
+        if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "error" </span><span class="cov4" title="3">{
                 onError = "ignore"
         }</span>
-        <span class="cov10" title="14">return &amp;ExecutionContext{OnError: onError}</span>
+
+        <span class="cov10" title="15">return &amp;ExecutionContext{
+                Ctx:     ctx,
+                OnError: onError,
+                Errors:  []error{},
+        }</span>
 }
 
-func (ctx *ExecutionContext) Handle(err error) bool <span class="cov6" title="5">{
-        switch ctx.OnError </span>{
+func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov6" title="6">{
+        if err == nil </span><span class="cov1" title="1">{
+                return true // no-op
+        }</span>
+
+        <span class="cov6" title="5">switch ctx.OnError </span>{
         case "fail":<span class="cov3" title="2">
                 return false</span>
         case "error":<span class="cov1" title="1">
@@ -327,12 +340,13 @@ func (r *Registry) Register(op Operator) <span class="cov10" title="4">{
 func (r *Registry) Apply(ctx *ExecutionContext, input map[string]interface{}, instr model.Instruction) bool <span class="cov10" title="4">{
         op, ok := r.ops[instr.Op]
         if !ok </span><span class="cov5" title="2">{
-                return ctx.Handle(fmt.Errorf("unknown op: %q", instr.Op))
+                return ctx.HandleError(fmt.Errorf("unknown op: %q", instr.Op))
         }</span>
-        <span class="cov5" title="2">err := op.Apply(ctx, input, instr)
-        if err != nil </span><span class="cov1" title="1">{
-                return ctx.Handle(err)
+
+        <span class="cov5" title="2">if err := op.Apply(ctx, input, instr); err != nil </span><span class="cov1" title="1">{
+                return ctx.HandleError(err)
         }</span>
+
         <span class="cov1" title="1">return true</span>
 }
 </pre>

@@ -1,18 +1,33 @@
 package transform
 
+import (
+	"context"
+)
+
 type ExecutionContext struct {
+	Ctx context.Context
+
 	OnError string  // "ignore", "fail", "error"
 	Errors  []error // Collected if OnError = "error"
 }
 
-func NewExecutionContext(onError string) *ExecutionContext {
+func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext {
 	if onError != "ignore" && onError != "fail" && onError != "error" {
 		onError = "ignore"
 	}
-	return &ExecutionContext{OnError: onError}
+
+	return &ExecutionContext{
+		Ctx:     ctx,
+		OnError: onError,
+		Errors:  []error{},
+	}
 }
 
-func (ctx *ExecutionContext) Handle(err error) bool {
+func (ctx *ExecutionContext) HandleError(err error) bool {
+	if err == nil {
+		return true // no-op
+	}
+
 	switch ctx.OnError {
 	case "fail":
 		return false
