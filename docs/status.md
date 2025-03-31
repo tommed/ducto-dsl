@@ -11,6 +11,7 @@
 ---
 
 ## Notes:
+- Detailed code coverage is available [here](https://tommed.github.io/dsl-transformer/coverage.html#file1)
 - All commits run `golangci-lint`, unit tests, integration tests
 - Code coverage is automatically reported via Codecov
 - Coverage HTML reports can be generated locally with `make coverage`

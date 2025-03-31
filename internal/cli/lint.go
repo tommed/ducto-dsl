@@ -12,7 +12,7 @@ import (
 //goland:noinspection GoUnhandledErrorResult
 func LintCommand(args []string) int {
 	if len(args) < 1 {
-		fmt.Fprintln(os.Stderr, "usage: ducto lint <program.json>")
+		fmt.Fprintln(os.Stderr, "usage: ducto-dsl lint <program.json>")
 		return 1
 	}
 

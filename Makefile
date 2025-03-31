@@ -18,7 +18,7 @@ all: check
 
 check: lint test-full coverage
 
-ci: check example-simplest example-map cli-macos
+ci: check example-simplest example-map ducto-dsl ducto-dsl.exe
 
 clean:
 	@rm -f $(COVERAGE_OUT) coverage.html cli-macos
@@ -64,6 +64,10 @@ example-map:
 	@echo "==> Running map example"
 	@cat test/data/input.json | $(GO) run ./cmd/transformer-cli examples/map.json
 
-cli-macos:
+ducto-dsl:
 	@echo "==> Building macOS CLI"
-	GOOS=darwin GOARCH=arm64 $(GO) build -o cli-macos ./cmd/transformer-cli
+	$(GO) build -o ducto-dsl ./cmd/transformer-cli
+
+ducto-dsl.exe:
+	@echo "==> Building Windows CLI"
+	GOOS=windows GOARCH=amd64 $(GO) build -o ducto-dsl.exe ./cmd/transformer-cli

@@ -10,7 +10,7 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 
 	// Pre-Guards
 	if len(args) < 1 {
-		fmt.Fprintln(stderr, "usage: transformer-cli <program.json>")
+		fmt.Fprintln(stderr, "usage: ducto-dsl <program.json>")
 		return 1
 	}
 
