@@ -40,7 +40,7 @@ See [SPEC.md](./SPEC.md) for a specification of the DSL.
 ---
 
 ## Features (WIP)
-- [x] Declarative `set` operations
+- [x] Declarative `set` and `copy` operations
 - [ ] Support for `map`, `delete`, `merge`
 - [ ] Conditionals
 - [ ] CLI for local testing

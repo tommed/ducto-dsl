@@ -17,13 +17,13 @@ func (r *Registry) Register(op Operator) {
 	r.ops[op.Name()] = op
 }
 
-func (r *Registry) Apply(ctx *ExecutionContext, input map[string]interface{}, instr model.Instruction) bool {
+func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool {
 	op, ok := r.ops[instr.Op]
 	if !ok {
 		return ctx.HandleError(fmt.Errorf("unknown op: %q", instr.Op))
 	}
 
-	if err := op.Apply(ctx, input, instr); err != nil {
+	if err := op.Apply(ctx, reg, input, instr); err != nil {
 		return ctx.HandleError(err)
 	}
 

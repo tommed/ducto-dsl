@@ -10,7 +10,7 @@ type DeleteOperator struct{}
 
 func (d *DeleteOperator) Name() string { return "delete" }
 
-func (d *DeleteOperator) Apply(ctx *ExecutionContext, input map[string]interface{}, instr model.Instruction) error {
+func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error {
 	if instr.Key == "" {
 		return errors.New("delete op missing key")
 	}

@@ -18,6 +18,9 @@ func New() *Transformer {
 	reg.Register(&transform.SetOperator{})
 	reg.Register(&transform.CopyOperator{})
 	reg.Register(&transform.DeleteOperator{})
+	reg.Register(&transform.MapOperator{})
+	reg.Register(&transform.FailOperator{})
+	reg.Register(&transform.NoOperation{})
 	return &Transformer{reg: reg}
 }
 
@@ -35,7 +38,7 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 
 	// Apply instructions
 	for _, instr := range prog.Instructions {
-		if !t.reg.Apply(exec, output, instr) {
+		if !t.reg.Apply(exec, t.reg, output, instr) {
 			return nil, errors.New("execution halted due to an error")
 		}
 	}
