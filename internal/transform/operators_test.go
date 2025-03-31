@@ -1,6 +1,7 @@
 package transform
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -50,7 +51,7 @@ func TestOperators(t *testing.T) {
 				input[k] = v
 			}
 			assert.Equal(t, tt.expectedName, tt.op.Name())
-			exec := NewExecutionContext("fail")
+			exec := NewExecutionContext(context.Background(), "fail")
 			err := tt.op.Apply(exec, input, tt.instr)
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -97,7 +98,7 @@ func TestOperators_ValidationErrors(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			exec := NewExecutionContext("fail")
+			exec := NewExecutionContext(context.Background(), "fail")
 			err := tt.op.Apply(exec, map[string]interface{}{}, tt.instruction)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), tt.wantErr)

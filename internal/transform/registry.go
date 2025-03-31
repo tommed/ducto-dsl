@@ -20,11 +20,12 @@ func (r *Registry) Register(op Operator) {
 func (r *Registry) Apply(ctx *ExecutionContext, input map[string]interface{}, instr model.Instruction) bool {
 	op, ok := r.ops[instr.Op]
 	if !ok {
-		return ctx.Handle(fmt.Errorf("unknown op: %q", instr.Op))
+		return ctx.HandleError(fmt.Errorf("unknown op: %q", instr.Op))
 	}
-	err := op.Apply(ctx, input, instr)
-	if err != nil {
-		return ctx.Handle(err)
+
+	if err := op.Apply(ctx, input, instr); err != nil {
+		return ctx.HandleError(err)
 	}
+
 	return true
 }

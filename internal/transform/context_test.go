@@ -1,14 +1,20 @@
 package transform
 
 import (
+	"context"
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestNewExecutionContext_DefaultErrorBehaviour(t *testing.T) {
-	exec := NewExecutionContext("")
+	exec := NewExecutionContext(context.Background(), "")
 	assert.Equal(t, "ignore", exec.OnError)
+}
+
+func TestNewExecutionContext_HandleNoError(t *testing.T) {
+	exec := NewExecutionContext(context.Background(), "")
+	assert.True(t, exec.HandleError(nil))
 }
 
 func TestNewExecutionContext_HandleError(t *testing.T) {
@@ -37,9 +43,9 @@ func TestNewExecutionContext_HandleError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			exec := NewExecutionContext(tt.args.onError)
+			exec := NewExecutionContext(context.Background(), tt.args.onError)
 			exec.OnError = tt.args.onError // reset to avoid defaulting behaviour
-			got := exec.Handle(errors.New("not relevant"))
+			got := exec.HandleError(errors.New("not relevant"))
 			expected := tt.wantSuccess
 			assert.Equal(t, expected, got)
 		})

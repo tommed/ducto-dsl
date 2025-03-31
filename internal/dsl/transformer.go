@@ -31,16 +31,16 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 	}
 
 	// Create a new context
-	exec := transform.NewExecutionContext(prog.OnError)
+	exec := transform.NewExecutionContext(ctx, prog.OnError)
 
 	// Apply instructions
 	for _, instr := range prog.Instructions {
 		if !t.reg.Apply(exec, output, instr) {
-			return nil, errors.New("execution halted on error")
+			return nil, errors.New("execution halted due to an error")
 		}
 	}
 
-	// Handle errors
+	// HandleError errors
 	if exec.OnError == "error" && len(exec.Errors) > 0 {
 		output["@dsl_errors"] = exec.Errors
 	}
