@@ -2,29 +2,26 @@ package dsl
 
 import (
 	"context"
-	"errors"
+	"github.com/tommed/dsl-transformer/internal/model"
+	"github.com/tommed/dsl-transformer/internal/transform"
 )
 
-type Instruction struct {
-	Op    string      `json:"op"`
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-}
-
-type Program struct {
-	Instructions []Instruction `json:"instructions"`
-}
-
 // Transformer applies DSL-defined transformations
-type Transformer struct{}
+type Transformer struct {
+	reg *transform.Registry
+}
 
 // New creates a new Transformer
 func New() *Transformer {
-	return &Transformer{}
+	reg := transform.NewRegistry()
+	reg.Register(&transform.SetOperator{})
+	reg.Register(&transform.CopyOperator{})
+	reg.Register(&transform.DeleteOperator{})
+	return &Transformer{reg: reg}
 }
 
 // Apply applies the given transformation definition
-func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) {
+func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *model.Program) (map[string]interface{}, error) {
 
 	// Create our output, start with the input values
 	output := make(map[string]interface{})
@@ -33,11 +30,8 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 	}
 
 	for _, instr := range prog.Instructions {
-		switch instr.Op {
-		case "set":
-			output[instr.Key] = instr.Value
-		default:
-			return nil, errors.New("unsupported op: " + instr.Op)
+		if err := t.reg.Apply(ctx, output, instr); err != nil {
+			return nil, err
 		}
 	}
 
