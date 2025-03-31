@@ -37,7 +37,7 @@ It is:
 
 ## DSL Specification
 
-See [doc/SPEC.md](docs/specs.md) for a specification of the DSL.
+See [doc/specs.md](docs/specs.md) for a specification of the DSL.
 
 ---
 
