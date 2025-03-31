@@ -88,8 +88,7 @@ func TestRegistry_Apply(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			exec := NewExecutionContext(context.Background(), tt.args.onError)
-			r := NewRegistry()
-			r.Register(&SetOperator{})
+			r := NewDefaultRegistry(&NoOperation{})
 			err := r.Find("set").Validate(tt.args.instr)
 			wantSuccess := false
 			if err == nil {

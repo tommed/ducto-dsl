@@ -45,8 +45,8 @@ See [doc/SPEC.md](docs/specs) for a specification of the DSL.
 - [x] CLI for local testing
 - [x] Declarative `set` and `copy` operations
 - [x] Support for `map`, `delete`, `merge`
+- [x] Linter included for instruction validation
 - [ ] Conditionals
-- [ ] Validator and Linter included
 - [ ] Embeddable Go SDK
 - [ ] Input can be JSON or YAML
 - [ ] HCL-powered syntax option
@@ -66,6 +66,12 @@ See [doc/SPEC.md](docs/specs) for a specification of the DSL.
     {"op": "set", "key": "greeting", "value": "hello world"}
   ]
 }
+```
+
+## Lint
+
+```bash
+go run ./cmd/transformer-cli lint examples/simplest.json
 ```
 
 ## Run

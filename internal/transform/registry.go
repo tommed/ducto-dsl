@@ -9,6 +9,21 @@ type Registry struct {
 	ops map[string]Operator
 }
 
+func NewDefaultRegistry(optional ...Operator) *Registry {
+	reg := NewRegistry()
+	reg.Register(&SetOperator{})
+	reg.Register(&CopyOperator{})
+	reg.Register(&DeleteOperator{})
+	reg.Register(&MapOperator{})
+	reg.Register(&FailOperator{})
+	reg.Register(&NoOperation{})
+	reg.Register(&MergeOperator{})
+	for _, op := range optional {
+		reg.Register(op)
+	}
+	return reg
+}
+
 func NewRegistry() *Registry {
 	return &Registry{ops: map[string]Operator{}}
 }
