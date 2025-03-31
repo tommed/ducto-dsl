@@ -1,8 +1,6 @@
-<div style="display:inline-block;border-radius: 50%;padding:60px;background-color: #F6F3EF;border:10px solid #6E5BAA">
-    <img alt="Ducto Logo" src="./assets/ducto-logo-small.png" />
-</div>
+![Ducto Logo](./assets/ducto-logo-small.png)
 
-<h1 style="color:#6E5BAA">DSL Transformer</h1>
+# DSL Transformer
 
 [![CI](https://github.com/tommed/dsl-transformer/actions/workflows/ci.yml/badge.svg)](https://github.com/tommed/dsl-transformer/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/tommed/dsl-transformer/branch/main/graph/badge.svg)](https://codecov.io/gh/tommed/dsl-transformer)
