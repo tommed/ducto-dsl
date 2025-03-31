@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/tommed/dsl-transformer/internal/model"
 	"io"
 	"os"
 
@@ -27,7 +28,7 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return 1
 	}
 
-	var prog dsl.Program
+	var prog model.Program
 	if err := json.Unmarshal(progData, &prog); err != nil {
 		fmt.Fprintf(stderr, "failed to parse program: %v\n", err)
 		return 1

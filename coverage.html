@@ -61,6 +61,14 @@
 				
 				<option value="file2">github.com/tommed/dsl-transformer/internal/dsl/transformer.go (100.0%)</option>
 				
+				<option value="file3">github.com/tommed/dsl-transformer/internal/transform/op_copy.go (100.0%)</option>
+				
+				<option value="file4">github.com/tommed/dsl-transformer/internal/transform/op_delete.go (100.0%)</option>
+				
+				<option value="file5">github.com/tommed/dsl-transformer/internal/transform/op_set.go (100.0%)</option>
+				
+				<option value="file6">github.com/tommed/dsl-transformer/internal/transform/registry.go (0.0%)</option>
+				
 				</select>
 			</div>
 			<div id="legend">
@@ -100,6 +108,7 @@ import (
         "context"
         "encoding/json"
         "fmt"
+        "github.com/tommed/dsl-transformer/internal/model"
         "io"
         "os"
 
@@ -123,7 +132,7 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span 
                 return 1
         }</span>
 
-        <span class="cov7" title="4">var prog dsl.Program
+        <span class="cov7" title="4">var prog model.Program
         if err := json.Unmarshal(progData, &amp;prog); err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(stderr, "failed to parse program: %v\n", err)
                 return 1
@@ -153,29 +162,26 @@ func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span 
 
 import (
         "context"
-        "errors"
+        "github.com/tommed/dsl-transformer/internal/model"
+        "github.com/tommed/dsl-transformer/internal/transform"
 )
 
-type Instruction struct {
-        Op    string      `json:"op"`
-        Key   string      `json:"key"`
-        Value interface{} `json:"value"`
-}
-
-type Program struct {
-        Instructions []Instruction `json:"instructions"`
-}
-
 // Transformer applies DSL-defined transformations
-type Transformer struct{}
+type Transformer struct {
+        reg *transform.Registry
+}
 
 // New creates a new Transformer
 func New() *Transformer <span class="cov10" title="2">{
-        return &amp;Transformer{}
+        reg := transform.NewRegistry()
+        reg.Register(&amp;transform.SetOperator{})
+        reg.Register(&amp;transform.CopyOperator{})
+        reg.Register(&amp;transform.DeleteOperator{})
+        return &amp;Transformer{reg: reg}
 }</span>
 
 // Apply applies the given transformation definition
-func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) <span class="cov10" title="2">{
+func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *model.Program) (map[string]interface{}, error) <span class="cov10" title="2">{
 
         // Create our output, start with the input values
         output := make(map[string]interface{})
@@ -184,15 +190,109 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
         }</span>
 
         <span class="cov10" title="2">for _, instr := range prog.Instructions </span><span class="cov10" title="2">{
-                switch instr.Op </span>{
-                case "set":<span class="cov1" title="1">
-                        output[instr.Key] = instr.Value</span>
-                default:<span class="cov1" title="1">
-                        return nil, errors.New("unsupported op: " + instr.Op)</span>
-                }
+                if err := t.reg.Apply(ctx, output, instr); err != nil </span><span class="cov1" title="1">{
+                        return nil, err
+                }</span>
         }
 
         <span class="cov1" title="1">return output, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package transform
+
+import (
+        "context"
+        "errors"
+
+        "github.com/tommed/dsl-transformer/internal/model"
+)
+
+type CopyOperator struct{}
+
+func (c *CopyOperator) Name() string <span class="cov1" title="1">{ return "copy" }</span>
+
+func (c *CopyOperator) Apply(_ context.Context, input map[string]interface{}, instr model.Instruction) error <span class="cov10" title="3">{
+        if instr.From == "" </span><span class="cov1" title="1">{
+                return errors.New("copy op missing or invalid from")
+        }</span>
+        <span class="cov6" title="2">if instr.To == "" </span><span class="cov1" title="1">{
+                return errors.New("copy op missing or invalid to")
+        }</span>
+        <span class="cov1" title="1">input[instr.To] = input[instr.From]
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package transform
+
+import (
+        "context"
+        "errors"
+
+        "github.com/tommed/dsl-transformer/internal/model"
+)
+
+type DeleteOperator struct{}
+
+func (d *DeleteOperator) Name() string <span class="cov1" title="1">{ return "delete" }</span>
+
+func (d *DeleteOperator) Apply(_ context.Context, input map[string]interface{}, instr model.Instruction) error <span class="cov10" title="2">{
+        if instr.Key == "" </span><span class="cov1" title="1">{
+                return errors.New("delete op missing key")
+        }</span>
+        <span class="cov1" title="1">delete(input, instr.Key)
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package transform
+
+import (
+        "context"
+        "errors"
+        "github.com/tommed/dsl-transformer/internal/model"
+)
+
+type SetOperator struct{}
+
+func (s *SetOperator) Name() string <span class="cov1" title="1">{ return "set" }</span>
+
+func (s *SetOperator) Apply(_ context.Context, input map[string]interface{}, instr model.Instruction) error <span class="cov10" title="2">{
+        if instr.Key == "" </span><span class="cov1" title="1">{
+                return errors.New("set op missing key")
+        }</span>
+        <span class="cov1" title="1">input[instr.Key] = instr.Value
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package transform
+
+import (
+        "context"
+        "errors"
+        "github.com/tommed/dsl-transformer/internal/model"
+)
+
+type Registry struct {
+        ops map[string]Operator
+}
+
+func NewRegistry() *Registry <span class="cov0" title="0">{
+        return &amp;Registry{ops: map[string]Operator{}}
+}</span>
+
+func (r *Registry) Register(op Operator) <span class="cov0" title="0">{
+        r.ops[op.Name()] = op
+}</span>
+
+func (r *Registry) Apply(ctx context.Context, input map[string]interface{}, instr model.Instruction) error <span class="cov0" title="0">{
+        op, ok := r.ops[instr.Op]
+        if !ok </span><span class="cov0" title="0">{
+                return errors.New("unknown op: " + instr.Op)
+        }</span>
+        <span class="cov0" title="0">return op.Apply(ctx, input, instr)</span>
 }
 </pre>
 		

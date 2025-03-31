@@ -2,6 +2,7 @@ package dsl
 
 import (
 	"context"
+	"github.com/tommed/dsl-transformer/internal/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,8 +14,8 @@ func TestTransformer_Apply_NoOp(t *testing.T) {
 
 	input := map[string]interface{}{"foo": "bar"}
 
-	prog := &Program{
-		Instructions: []Instruction{
+	prog := &model.Program{
+		Instructions: []model.Instruction{
 			{Op: "set", Key: "greeting", Value: "hello world"},
 		},
 	}
@@ -33,8 +34,8 @@ func TestTransformer_Apply_InvalidOp(t *testing.T) {
 	tr := New()
 	input := map[string]interface{}{"foo": "bar"}
 
-	prog := &Program{
-		Instructions: []Instruction{
+	prog := &model.Program{
+		Instructions: []model.Instruction{
 			{Op: "invalid-op", Key: "foo", Value: 2},
 		},
 	}
