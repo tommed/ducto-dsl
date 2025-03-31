@@ -104,4 +104,5 @@ See [status.md](./status.md) for up-to-date CI, coverage, and project health.
 
 ## License
 
-[MIT](./LICENSE)
+- Code is all licensed under [MIT](./LICENSE)
+- Logos/Illustrations are Copyright 2025 Tom Medhurst, all rights reserved.
