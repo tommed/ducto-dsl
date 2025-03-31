@@ -29,15 +29,18 @@ func NewRegistry() *Registry {
 }
 
 func (r *Registry) Register(op Operator) {
-	r.ops[op.Name()] = op
+	name := op.Name()
+	if name == "" {
+		panic("operator has no name")
+	}
+	if _, exists := r.ops[name]; exists {
+		panic(fmt.Sprintf("operator with name '%s' is already registered", name))
+	}
+	r.ops[name] = op
 }
 
 func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool {
-	op, ok := r.ops[instr.Op]
-	if !ok {
-		return ctx.HandleError(fmt.Errorf("unknown op: %q", instr.Op))
-	}
-
+	op := r.ops[instr.Op]
 	if err := op.Apply(ctx, reg, input, instr); err != nil {
 		return ctx.HandleError(err)
 	}
