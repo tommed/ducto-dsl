@@ -2,7 +2,6 @@ package transform
 
 import (
 	"context"
-	"errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/tommed/dsl-transformer/internal/model"
 	"testing"
@@ -18,7 +17,7 @@ func TestRegistry_Apply(t *testing.T) {
 		name        string
 		args        args
 		wantSuccess bool
-		wantErrors  []error
+		wantErrors  []string
 	}{
 		{
 			name: "set op",
@@ -32,7 +31,7 @@ func TestRegistry_Apply(t *testing.T) {
 				},
 			},
 			wantSuccess: true,
-			wantErrors:  make([]error, 0), // no errors
+			wantErrors:  []string{}, // no errors
 		},
 		{
 			name: "invalid op + fail",
@@ -44,7 +43,7 @@ func TestRegistry_Apply(t *testing.T) {
 				},
 			},
 			wantSuccess: false,
-			wantErrors:  make([]error, 0), // no errors in list as using 'fail'
+			wantErrors:  []string{}, // no errors in list as using 'fail'
 		},
 		{
 			name: "invalid apply + fail",
@@ -57,7 +56,7 @@ func TestRegistry_Apply(t *testing.T) {
 				},
 			},
 			wantSuccess: false,
-			wantErrors:  make([]error, 0), // no errors in list as using 'fail'
+			wantErrors:  []string{}, // no errors in list as using 'fail'
 		},
 		{
 			name: "invalid op + error",
@@ -69,7 +68,7 @@ func TestRegistry_Apply(t *testing.T) {
 				},
 			},
 			wantSuccess: true, // ignored and continued
-			wantErrors:  []error{errors.New(`unknown op: "invalid_op"`)},
+			wantErrors:  []string{`unknown op: "invalid_op"`},
 		},
 	}
 	for _, tt := range tests {

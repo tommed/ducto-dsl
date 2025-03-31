@@ -12,13 +12,13 @@ LINTER_OPTS=--timeout=2m
 # General Targets
 # ----------------------
 
-.PHONY: all check ci lint test test-full coverage example-simplest clean cli-macos
+.PHONY: all check ci lint test test-full coverage example-simplest clean cli-macos example-map
 
 all: check
 
 check: lint test-full coverage
 
-ci: check example-simplest cli-macos
+ci: check example-simplest example-map cli-macos
 
 clean:
 	@rm -f $(COVERAGE_OUT) coverage.html cli-macos
@@ -59,6 +59,10 @@ coverage:
 example-simplest:
 	@echo "==> Running simplest example"
 	@echo '{"foo":"bar"}' | $(GO) run ./cmd/transformer-cli examples/simplest.json
+
+example-map:
+	@echo "==> Running map example"
+	@cat test/data/input.json | $(GO) run ./cmd/transformer-cli examples/map.json
 
 cli-macos:
 	@echo "==> Building macOS CLI"

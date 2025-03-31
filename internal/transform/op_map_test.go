@@ -133,6 +133,9 @@ func TestMapOperator_Apply(t *testing.T) {
 			r.Register(&FailOperator{})
 			err := mapOp.Apply(exec, r, input, tt.args.instr)
 			assert.Equal(t, err, tt.wantErr)
+			if tt.wantErr == nil && err != nil {
+				assert.NoError(t, err)
+			}
 			if err == nil {
 				data, _ := json.Marshal(input)
 				assert.Contains(t, string(data), tt.wantContains)
