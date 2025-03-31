@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "on_error": "fail",
   "instructions": [
     {
       "op": "set",

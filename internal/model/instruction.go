@@ -23,5 +23,6 @@ type Instruction struct {
 }
 
 type Program struct {
+	OnError      string        `json:"on_error,omitempty"`
 	Instructions []Instruction `json:"instructions"`
 }
