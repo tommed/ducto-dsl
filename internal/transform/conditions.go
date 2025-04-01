@@ -22,7 +22,7 @@ func validateConditions(condition map[string]interface{}) error {
 	for key := range condition {
 		switch key {
 		case "exists", "equals", "or", "and":
-			return nil
+			break
 		default:
 			return fmt.Errorf("unknown condition %q", key)
 		}
