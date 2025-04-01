@@ -53,6 +53,8 @@ See [doc/specs.md](docs/specs.md) for a specification of the DSL.
 - [ ] Serverless runtime compatibility
 - [ ] OpenTelemetry instrumentation
 
+Also, see our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md).
+
 ---
 
 ## Example
@@ -92,6 +94,8 @@ Output:
 
 ## Development
 
+Please make sure you read our [Code of Conduct](./CODE_OF_CONDUCT.md) before engaging with this project. 
+
 ### Testing
 
 ```bash
@@ -111,8 +115,9 @@ make cli-macos
 ## Status
 
 See [status.md](docs/status.md) for up-to-date CI, coverage, and project health.
+Our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md) also provides an overview of where we are with this project.
 
 ## License
 
 - Code is all licensed under [MIT](./LICENSE)
-- Logos/Illustrations are Copyright 2025 Tom Medhurst, all rights reserved.
+- The Ducto name, logos and robot illustrations (and likeness) are (C) Copyright 2025 Tom Medhurst, all rights reserved.
