@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/tommed/dsl-transformer/internal/cli"
+	"github.com/tommed/ducto-dsl/internal/cli"
 	"os"
 )
 

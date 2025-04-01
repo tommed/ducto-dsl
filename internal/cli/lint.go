@@ -3,9 +3,9 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tommed/dsl-transformer/internal/dsl"
-	"github.com/tommed/dsl-transformer/internal/model"
-	"github.com/tommed/dsl-transformer/internal/transform"
+	"github.com/tommed/ducto-dsl/internal/dsl"
+	"github.com/tommed/ducto-dsl/internal/model"
+	"github.com/tommed/ducto-dsl/internal/transform"
 	"os"
 )
 

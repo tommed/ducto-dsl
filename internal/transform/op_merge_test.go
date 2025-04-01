@@ -2,12 +2,12 @@ package transform_test
 
 import (
 	"context"
-	"github.com/tommed/dsl-transformer/internal/dsl"
+	"github.com/tommed/ducto-dsl/internal/dsl"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/dsl-transformer/internal/model"
-	"github.com/tommed/dsl-transformer/internal/transform"
+	"github.com/tommed/ducto-dsl/internal/model"
+	"github.com/tommed/ducto-dsl/internal/transform"
 )
 
 func TestMergeOperator_Apply(t *testing.T) {

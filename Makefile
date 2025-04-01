@@ -13,13 +13,15 @@ LINTER_OPTS=--timeout=2m
 # General Targets
 # ----------------------
 
-.PHONY: all check ci lint test test-full coverage example-simplest clean example-map ducto-dsl ducto-dsl.exe
+.PHONY: all check ci lint test test-full coverage example-simplest clean example-map build-all ducto-dsl-macos ducto-dsl-windows
 
 all: check
 
 check: lint test-full coverage
 
-ci: check example-simplest example-map ducto-dsl ducto-dsl.exe
+build-all: ducto-dsl-macos ducto-dsl-windows
+
+ci: check example-simplest example-map build-all
 
 clean:
 	@rm -f $(COVERAGE_OUT) $(COVERAGE_HTML) ducto-dsl*
@@ -59,16 +61,16 @@ coverage:
 
 example-simplest:
 	@echo "==> Running simplest example"
-	@echo '{"foo":"bar"}' | $(GO) run ./cmd/transformer-cli examples/simplest.json
+	@echo '{"foo":"bar"}' | $(GO) run ./cmd/ducto-dsl examples/simplest.json
 
 example-map:
 	@echo "==> Running map example"
-	@cat test/data/input.json | $(GO) run ./cmd/transformer-cli examples/map.json
+	@cat test/data/input.json | $(GO) run ./cmd/ducto-dsl examples/map.json
 
-ducto-dsl:
+ducto-dsl-macos:
 	@echo "==> Building macOS CLI"
-	$(GO) build -o ducto-dsl ./cmd/transformer-cli
+	$(GO) build -o ducto-dsl ./cmd/ducto-dsl
 
-ducto-dsl.exe:
+ducto-dsl-windows:
 	@echo "==> Building Windows CLI"
-	GOOS=windows GOARCH=amd64 $(GO) build -o ducto-dsl.exe ./cmd/transformer-cli
+	GOOS=windows GOARCH=amd64 $(GO) build -o ducto-dsl.exe ./cmd/ducto-dsl
