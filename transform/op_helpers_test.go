@@ -1,6 +1,8 @@
 package transform
 
-import "github.com/tommed/ducto-dsl/internal/model"
+import (
+	"github.com/tommed/ducto-dsl/model"
+)
 
 type fakeOperator struct{}
 

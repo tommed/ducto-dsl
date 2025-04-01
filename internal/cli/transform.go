@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/tommed/ducto-dsl/internal/dsl"
-	"github.com/tommed/ducto-dsl/internal/model"
+	"github.com/tommed/ducto-dsl/model"
 	"io"
 	"os"
 )

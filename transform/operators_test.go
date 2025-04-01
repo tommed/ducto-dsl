@@ -2,10 +2,10 @@ package transform
 
 import (
 	"context"
+	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/internal/model"
 )
 
 func TestOperators(t *testing.T) {

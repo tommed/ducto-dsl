@@ -2,8 +2,8 @@ package dsl
 
 import (
 	"fmt"
-	"github.com/tommed/ducto-dsl/internal/model"
-	"github.com/tommed/ducto-dsl/internal/transform"
+	"github.com/tommed/ducto-dsl/model"
+	"github.com/tommed/ducto-dsl/transform"
 )
 
 func ValidateProgram(r *transform.Registry, prog *model.Program) error {

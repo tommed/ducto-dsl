@@ -1,6 +1,8 @@
 package transform
 
-import "github.com/tommed/ducto-dsl/internal/model"
+import (
+	"github.com/tommed/ducto-dsl/model"
+)
 
 // NoOperation is our nil implementation, it literally does nothing and never fails
 type NoOperation struct{}

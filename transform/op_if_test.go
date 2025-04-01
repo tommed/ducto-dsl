@@ -3,11 +3,11 @@ package transform
 import (
 	"context"
 	"errors"
+	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tommed/ducto-dsl/internal/model"
 )
 
 func TestIfOperator_Validate(t *testing.T) {

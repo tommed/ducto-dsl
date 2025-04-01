@@ -2,14 +2,14 @@ package dsl
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/internal/model"
-	"github.com/tommed/ducto-dsl/internal/transform"
+	"github.com/tommed/ducto-dsl/model"
+	transform2 "github.com/tommed/ducto-dsl/transform"
 	"testing"
 )
 
 func TestValidateProgram_BadInstruction(t *testing.T) {
-	r := transform.NewRegistry()
-	r.Register(&transform.SetOperator{})
+	r := transform2.NewRegistry()
+	r.Register(&transform2.SetOperator{})
 	err := ValidateProgram(r, &model.Program{
 		Version: 1,
 		OnError: "fail",
@@ -23,9 +23,9 @@ func TestValidateProgram_BadInstruction(t *testing.T) {
 }
 
 func TestValidateProgram_BadSubInstruction(t *testing.T) {
-	r := transform.NewRegistry()
-	r.Register(&transform.SetOperator{})
-	r.Register(&transform.MapOperator{})
+	r := transform2.NewRegistry()
+	r.Register(&transform2.SetOperator{})
+	r.Register(&transform2.MapOperator{})
 	err := ValidateProgram(r, &model.Program{
 		Version: 1,
 		OnError: "fail",
