@@ -72,7 +72,7 @@ Also, see our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md).
 }
 ```
 
-### `examples/encrich-log.json`
+### `examples/enrich-log.json`
 
 **Purpose:** Enrich incoming telemetry events with environment defaults, severity mapping, and drop test/debug data.
 
@@ -163,17 +163,11 @@ go run ./cmd/ducto-dsl lint examples/simplest.json
 ### Run
 
 ```bash
-echo '{"foo":"bar"}' | go run ./cmd/ducto-dsl ./examples/simplest.json
-```
+# Simple Example
+echo '{"foo":"bar"}' | go run ./cmd/ducto-dsl examples/simplest.json
 
-#### Output:
-
-```json
-{
-  "foo": "bar",
-  "greeting": "hello world"
-}
-
+# Telemetry Example
+go run ./cmd/ducto-dsl examples/enrich-log.json < test/data/input-telemetry-log.json
 ```
 
 ## Development
