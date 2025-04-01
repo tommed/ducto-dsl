@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "instructions": [
+    
+    { "op": "coalesce", "key": "env", "value": "default-env" },
+    { "op": "coalesce", "key": "level", "value": "low" },
+
+    { "op": "if", "condition": { "equals": { "key": "level", "value": "warn" } }, "then": [
+      { "op": "set", "key": "severity", "value": "medium" }
+    ]},
+    {
+      "op": "if",
+      "condition": {
+        "or": [
+          { "equals": { "key": "level", "value": "error" } },
+          { "equals": { "key": "level", "value": "critical" } }
+        ]
+      },
+      "then": [
+        { "op": "set", "key": "severity", "value": "high" }
+      ]
+    },
+
+    { "op": "delete", "key": "debug_info" },
+    { "op": "set", "key": "processed", "value": true }
+  ]
+}

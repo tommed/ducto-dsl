@@ -1,0 +1,823 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>ducto-dsl: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/tommed/ducto-dsl/cmd/ducto-dsl/main.go (0.0%)</option>
+				
+				<option value="file1">github.com/tommed/ducto-dsl/internal/cli/lint.go (100.0%)</option>
+				
+				<option value="file2">github.com/tommed/ducto-dsl/internal/cli/runner.go (100.0%)</option>
+				
+				<option value="file3">github.com/tommed/ducto-dsl/internal/cli/transform.go (100.0%)</option>
+				
+				<option value="file4">github.com/tommed/ducto-dsl/internal/dsl/transformer.go (100.0%)</option>
+				
+				<option value="file5">github.com/tommed/ducto-dsl/internal/dsl/validate.go (100.0%)</option>
+				
+				<option value="file6">github.com/tommed/ducto-dsl/internal/transform/conditions.go (98.0%)</option>
+				
+				<option value="file7">github.com/tommed/ducto-dsl/internal/transform/context.go (100.0%)</option>
+				
+				<option value="file8">github.com/tommed/ducto-dsl/internal/transform/noop.go (100.0%)</option>
+				
+				<option value="file9">github.com/tommed/ducto-dsl/internal/transform/op_copy.go (100.0%)</option>
+				
+				<option value="file10">github.com/tommed/ducto-dsl/internal/transform/op_delete.go (100.0%)</option>
+				
+				<option value="file11">github.com/tommed/ducto-dsl/internal/transform/op_fail.go (100.0%)</option>
+				
+				<option value="file12">github.com/tommed/ducto-dsl/internal/transform/op_if.go (100.0%)</option>
+				
+				<option value="file13">github.com/tommed/ducto-dsl/internal/transform/op_map.go (100.0%)</option>
+				
+				<option value="file14">github.com/tommed/ducto-dsl/internal/transform/op_merge.go (100.0%)</option>
+				
+				<option value="file15">github.com/tommed/ducto-dsl/internal/transform/op_set.go (100.0%)</option>
+				
+				<option value="file16">github.com/tommed/ducto-dsl/internal/transform/registry.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "github.com/tommed/ducto-dsl/internal/cli"
+        "os"
+)
+
+func main() <span class="cov0" title="0">{
+        os.Exit(cli.RunCLI(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package cli
+
+import (
+        "encoding/json"
+        "fmt"
+        "github.com/tommed/ducto-dsl/internal/dsl"
+        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/internal/transform"
+        "os"
+)
+
+//goland:noinspection GoUnhandledErrorResult
+func LintCommand(args []string) int <span class="cov10" title="5">{
+        if len(args) &lt; 1 </span><span class="cov1" title="1">{
+                fmt.Fprintln(os.Stderr, "usage: ducto-dsl lint &lt;program.json&gt;")
+                return 1
+        }</span>
+
+        // Load file
+        <span class="cov8" title="4">programFile := args[0]
+        data, err := os.ReadFile(programFile)
+        if err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(os.Stderr, "failed to read %s: %v\n", programFile, err)
+                return 1
+        }</span>
+
+        // Parse JSON
+        <span class="cov7" title="3">var prog model.Program
+        if err := json.Unmarshal(data, &amp;prog); err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(os.Stderr, "invalid JSON: %v\n", err)
+                return 1
+        }</span>
+
+        // Validate program
+        <span class="cov4" title="2">reg := transform.NewDefaultRegistry()
+        if err := dsl.ValidateProgram(reg, &amp;prog); err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(os.Stderr, "program validation failed: %v\n", err)
+                return 1
+        }</span>
+
+        <span class="cov1" title="1">fmt.Println("Program is valid ✅")
+        return 0</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package cli
+
+import (
+        "fmt"
+        "io"
+)
+
+//goland:noinspection GoUnhandledErrorResult
+func RunCLI(args []string, stdin io.Reader, stdout, stderr io.Writer) int <span class="cov10" title="12">{
+
+        // Pre-Guards
+        if len(args) &lt; 1 </span><span class="cov1" title="1">{
+                fmt.Fprintln(stderr, "usage: ducto-dsl &lt;program.json&gt;")
+                return 1
+        }</span>
+
+        <span class="cov9" title="11">switch args[0] </span>{
+        case "lint":<span class="cov6" title="5">
+                return LintCommand(args[1:])</span>
+        default:<span class="cov7" title="6">
+                return TransformCommand(args, stdin, stdout, stderr)</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package cli
+
+import (
+        "context"
+        "encoding/json"
+        "fmt"
+        "github.com/tommed/ducto-dsl/internal/dsl"
+        "github.com/tommed/ducto-dsl/internal/model"
+        "io"
+        "os"
+)
+
+//goland:noinspection GoUnhandledErrorResult
+func TransformCommand(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int <span class="cov10" title="6">{
+        progData, err := os.ReadFile(args[0])
+        if err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(stderr, "failed to read program file: %v\n", err)
+                return 1
+        }</span>
+
+        <span class="cov9" title="5">var prog model.Program
+        if err := json.Unmarshal(progData, &amp;prog); err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(stderr, "failed to parse program: %v\n", err)
+                return 1
+        }</span>
+
+        <span class="cov7" title="4">var input map[string]interface{}
+        if err := json.NewDecoder(stdin).Decode(&amp;input); err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(stderr, "failed to parse input json: %v\n", err)
+                return 1
+        }</span>
+
+        <span class="cov6" title="3">tr := dsl.New()
+        out, err := tr.Apply(context.Background(), input, &amp;prog)
+        if err != nil </span><span class="cov1" title="1">{
+                fmt.Fprintf(stderr, "error: %v\n", err)
+                return 1
+        }</span>
+
+        <span class="cov4" title="2">enc := json.NewEncoder(stdout)
+        enc.SetIndent("", "  ")
+        _ = enc.Encode(out)
+        return 0</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package dsl
+
+import (
+        "context"
+        "errors"
+        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/internal/transform"
+)
+
+// Transformer applies DSL-defined transformations
+type Transformer struct {
+        reg *transform.Registry
+}
+
+// New creates a new Transformer
+func New() *Transformer <span class="cov10" title="8">{
+        reg := transform.NewDefaultRegistry()
+        return &amp;Transformer{reg: reg}
+}</span>
+
+// Apply applies the given transformation definition
+func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *model.Program) (map[string]interface{}, error) <span class="cov10" title="8">{
+
+        // Validate program before execution
+        if err := ValidateProgram(t.reg, prog); err != nil </span><span class="cov7" title="4">{
+                return nil, err
+        }</span>
+
+        // Create a new context
+        <span class="cov7" title="4">exec := transform.NewExecutionContext(ctx, prog.OnError)
+
+        // Create our output, start with the input values
+        output := make(map[string]interface{})
+        for k, v := range input </span><span class="cov1" title="1">{
+                output[k] = v
+        }</span>
+
+        // Apply instructions
+        <span class="cov7" title="4">for _, instr := range prog.Instructions </span><span class="cov5" title="3">{
+                if !t.reg.Apply(exec, t.reg, output, instr) </span><span class="cov1" title="1">{
+                        return nil, errors.New("execution halted due to an error")
+                }</span>
+        }
+
+        // HandleError errors
+        <span class="cov5" title="3">if exec.OnError == "capture" &amp;&amp; len(exec.Errors) &gt; 0 </span><span class="cov1" title="1">{
+                output["@dsl_errors"] = exec.Errors
+        }</span>
+
+        <span class="cov5" title="3">return output, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package dsl
+
+import (
+        "fmt"
+        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/internal/transform"
+)
+
+func ValidateProgram(r *transform.Registry, prog *model.Program) error <span class="cov10" title="11">{
+        if prog == nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("program is nil")
+        }</span>
+        <span class="cov9" title="10">if prog.Version != 1 </span><span class="cov3" title="2">{
+                return fmt.Errorf("program version %d is unsupported", prog.Version)
+        }</span>
+
+        <span class="cov8" title="8">for i, instr := range prog.Instructions </span><span class="cov8" title="7">{
+                op := r.Find(instr.Op)
+                if op == nil </span><span class="cov1" title="1">{
+                        return fmt.Errorf("instruction #%d: unknown operator '%s'", i, instr.Op)
+                }</span>
+
+                <span class="cov7" title="6">if err := op.Validate(instr); err != nil </span><span class="cov3" title="2">{
+                        return fmt.Errorf("instruction #%d (%s): %w", i, instr.Op, err)
+                }</span>
+
+                // Validate nested instructions (e.g., map, if)
+                <span class="cov6" title="4">if len(instr.Then) &gt; 0 </span><span class="cov1" title="1">{
+                        subProg := &amp;model.Program{
+                                Version:      prog.Version,
+                                Instructions: instr.Then,
+                        }
+                        if err := ValidateProgram(r, subProg); err != nil </span><span class="cov1" title="1">{
+                                return fmt.Errorf("instruction #%d (%s): nested validation failed: %w", i, instr.Op, err)
+                        }</span>
+                }
+        }
+        <span class="cov6" title="4">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package transform
+
+import (
+        "encoding/json"
+        "errors"
+        "fmt"
+)
+
+// NOTE: when adding new conditions, make sure you update the following:
+//   - docs/spec-vX.md    (make sure it's documented first!)
+//   - validateConditions (switch for valid key list)
+//   - evaluateCondition  (implement your new condition)
+
+// validateConditions ensures the conditions map uses valid clauses
+func validateConditions(condition map[string]interface{}) error <span class="cov6" title="7">{
+        if len(condition) == 0 </span><span class="cov1" title="1">{
+                return errors.New("no conditions defined")
+        }</span>
+        <span class="cov5" title="6">if len(condition) &gt; 1 </span><span class="cov1" title="1">{
+                return fmt.Errorf("only one condition type is allowed per condition block, got: %v", condition)
+        }</span>
+        <span class="cov5" title="5">for key := range condition </span><span class="cov5" title="5">{
+                switch key </span>{
+                case "exists", "equals", "or", "and":<span class="cov4" title="4">
+                        return nil</span>
+                default:<span class="cov1" title="1">
+                        return fmt.Errorf("unknown condition %q", key)</span>
+                }
+        }
+        <span class="cov0" title="0">return nil</span> // impossible to reach technically
+}
+
+// evaluateCondition evaluates the conditions
+func evaluateCondition(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov10" title="26">{
+        switch </span>{
+        case condition["exists"] != nil:<span class="cov7" title="10">
+                return conditionExists(input, condition)</span>
+        case condition["equals"] != nil:<span class="cov7" title="9">
+                return conditionEquals(input, condition)</span>
+        case condition["or"] != nil:<span class="cov4" title="3">
+                return conditionOr(input, condition)</span>
+        case condition["and"] != nil:<span class="cov4" title="3">
+                return conditionAnd(input, condition)</span>
+        default:<span class="cov1" title="1">
+                return false</span>
+        }
+}
+
+func conditionExists(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov7" title="10">{
+        key, ok := condition["exists"].(string)
+        if !ok </span><span class="cov1" title="1">{
+                return false
+        }</span>
+        <span class="cov7" title="9">_, exists := input[key]
+        return exists</span>
+}
+
+func conditionEquals(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov7" title="9">{
+        data, ok := condition["equals"].(map[string]interface{})
+        if !ok </span><span class="cov1" title="1">{
+                return false
+        }</span>
+        <span class="cov6" title="8">key, ok := data["key"].(string)
+        if !ok </span><span class="cov1" title="1">{
+                return false
+        }</span>
+        <span class="cov6" title="7">expected := data["value"]
+
+        actual, exists := input[key]
+        if !exists </span><span class="cov2" title="2">{
+                return false
+        }</span>
+
+        // Optional: deep equality
+        <span class="cov5" title="5">return jsonEqual(actual, expected)</span>
+}
+
+func conditionOr(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov4" title="3">{
+        conds, ok := condition["or"].([]interface{})
+        if !ok </span><span class="cov1" title="1">{
+                return false
+        }</span>
+        <span class="cov2" title="2">for _, c := range conds </span><span class="cov4" title="3">{
+                if sub, ok := c.(map[string]interface{}); ok </span><span class="cov4" title="3">{
+                        if evaluateCondition(input, sub) </span><span class="cov1" title="1">{
+                                return true
+                        }</span>
+                }
+        }
+        <span class="cov1" title="1">return false</span>
+}
+
+func conditionAnd(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov4" title="3">{
+        conds, ok := condition["and"].([]interface{})
+        if !ok </span><span class="cov1" title="1">{
+                return false
+        }</span>
+        <span class="cov2" title="2">for _, c := range conds </span><span class="cov4" title="4">{
+                if sub, ok := c.(map[string]interface{}); ok </span><span class="cov4" title="4">{
+                        if !evaluateCondition(input, sub) </span><span class="cov1" title="1">{
+                                return false
+                        }</span>
+                }
+        }
+        <span class="cov1" title="1">return true</span>
+}
+
+func jsonEqual(a, b interface{}) bool <span class="cov5" title="5">{
+        aj, _ := json.Marshal(a)
+        bj, _ := json.Marshal(b)
+        return string(aj) == string(bj)
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package transform
+
+import (
+        "context"
+)
+
+type ExecutionContext struct {
+        Ctx context.Context
+
+        OnError string   // "ignore", "fail", "capture"
+        Errors  []string // Collected if OnError = "capture"
+}
+
+func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="36">{
+        if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "capture" </span><span class="cov3" title="3">{
+                onError = "ignore"
+        }</span>
+
+        <span class="cov10" title="36">return &amp;ExecutionContext{
+                Ctx:     ctx,
+                OnError: onError,
+                Errors:  []string{},
+        }</span>
+}
+
+func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov5" title="6">{
+        if err == nil </span><span class="cov1" title="1">{
+                return true // no-op
+        }</span>
+
+        <span class="cov5" title="5">switch ctx.OnError </span>{
+        case "fail":<span class="cov2" title="2">
+                return false</span>
+        case "capture":<span class="cov1" title="1">
+                ctx.Errors = append(ctx.Errors, err.Error())
+                return true</span>
+        case "ignore":<span class="cov1" title="1">
+                return true</span>
+        default:<span class="cov1" title="1">
+                return true</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package transform
+
+import "github.com/tommed/ducto-dsl/internal/model"
+
+// NoOperation is our nil implementation, it literally does nothing and never fails
+type NoOperation struct{}
+
+func (n NoOperation) Validate(instr model.Instruction) error <span class="cov1" title="1">{
+        return nil
+}</span>
+
+func (n NoOperation) Name() string <span class="cov10" title="10">{
+        return "noop"
+}</span>
+
+func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, _ model.Instruction) error <span class="cov1" title="1">{
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package transform
+
+import (
+        "errors"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type CopyOperator struct{}
+
+func (c *CopyOperator) Validate(instr model.Instruction) error <span class="cov5" title="3">{
+        if instr.From == "" </span><span class="cov1" title="1">{
+                return errors.New("copy op missing or invalid from")
+        }</span>
+        <span class="cov3" title="2">if instr.To == "" </span><span class="cov1" title="1">{
+                return errors.New("copy op missing or invalid to")
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (c *CopyOperator) Name() string <span class="cov10" title="10">{ return "copy" }</span>
+
+func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov1" title="1">{
+        input[instr.To] = input[instr.From]
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package transform
+
+import (
+        "errors"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type DeleteOperator struct{}
+
+func (d *DeleteOperator) Validate(instr model.Instruction) error <span class="cov3" title="2">{
+        if instr.Key == "" </span><span class="cov1" title="1">{
+                return errors.New("delete operator missing 'key'")
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (d *DeleteOperator) Name() string <span class="cov10" title="9">{ return "delete" }</span>
+
+func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov1" title="1">{
+        delete(input, instr.Key)
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package transform
+
+import (
+        "errors"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type FailOperator struct {
+}
+
+func (f FailOperator) Validate(instr model.Instruction) error <span class="cov1" title="1">{
+        return nil
+}</span>
+
+func (f FailOperator) Name() string <span class="cov10" title="14">{
+        return "fail"
+}</span>
+
+func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, instr model.Instruction) error <span class="cov3" title="2">{
+        return errors.New(instr.Value.(string))
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package transform
+
+import (
+        "errors"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type IfOperator struct{}
+
+func (o *IfOperator) Name() string <span class="cov8" title="6">{ return "if" }</span>
+
+func (o *IfOperator) Validate(instr model.Instruction) error <span class="cov10" title="9">{
+        if instr.Condition == nil </span><span class="cov1" title="1">{
+                return errors.New("if operator missing 'condition'")
+        }</span>
+        <span class="cov9" title="8">if len(instr.Then) == 0 </span><span class="cov1" title="1">{
+                return errors.New("if operator missing 'then' instructions")
+        }</span>
+        <span class="cov8" title="7">if err := validateConditions(instr.Condition); err != nil </span><span class="cov5" title="3">{
+                return err
+        }</span>
+        <span class="cov6" title="4">return nil</span>
+}
+
+func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov5" title="3">{
+        if evaluateCondition(input, instr.Condition) </span><span class="cov3" title="2">{
+                for _, sub := range instr.Then </span><span class="cov3" title="2">{
+                        op := reg.Find(sub.Op)
+                        if err := op.Apply(ctx, reg, input, sub); err != nil </span><span class="cov1" title="1">{
+                                return err
+                        }</span>
+                }
+        }
+        <span class="cov3" title="2">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package transform
+
+import (
+        "fmt"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type MapOperator struct{}
+
+func (o *MapOperator) Validate(instr model.Instruction) error <span class="cov8" title="9">{
+        if instr.Key == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("map operator requires 'key' field")
+        }</span>
+
+        <span class="cov7" title="8">if len(instr.Then) == 0 </span><span class="cov1" title="1">{
+                return fmt.Errorf("map operator requires at least one instruction in 'then'")
+        }</span>
+        <span class="cov7" title="7">return nil</span>
+}
+
+func (o *MapOperator) Name() string <span class="cov10" title="16">{
+        return "map"
+}</span>
+
+func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov7" title="8">{
+        arrVal, ok := input[instr.Key]
+        if !ok </span><span class="cov3" title="2">{
+                return fmt.Errorf("map operator: key %q not found in input", instr.Key)
+        }</span>
+
+        <span class="cov6" title="6">arr, ok := arrVal.([]interface{})
+        if !ok </span><span class="cov4" title="3">{
+                return fmt.Errorf("map operator: input[%q] is not an array", instr.Key)
+        }</span>
+
+        <span class="cov4" title="3">for i, item := range arr </span><span class="cov5" title="4">{
+                itemMap, ok := item.(map[string]interface{})
+                if !ok </span><span class="cov1" title="1">{
+                        return fmt.Errorf("map operator: array item at index %d is not an object", i)
+                }</span>
+
+                <span class="cov4" title="3">for _, subInstr := range instr.Then </span><span class="cov4" title="3">{
+                        if !reg.Apply(ctx, reg, itemMap, subInstr) </span><span class="cov1" title="1">{
+                                return fmt.Errorf("map operator: sub-instruction failed at index %d", i)
+                        }</span>
+                }
+        }
+
+        <span class="cov1" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package transform
+
+import (
+        "fmt"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type MergeOperator struct{}
+
+func (o *MergeOperator) Name() string <span class="cov10" title="13">{
+        return "merge"
+}</span>
+
+func (o *MergeOperator) Validate(instr model.Instruction) error <span class="cov7" title="6">{
+        if instr.Value == nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("merge operator missing 'value'")
+        }</span>
+        <span class="cov6" title="5">if _, ok := instr.Value.(map[string]interface{}); !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("merge operator: 'value' must be an object")
+        }</span>
+        <span class="cov5" title="4">return nil</span>
+}
+
+func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov5" title="4">{
+        for k, v := range instr.Value.(map[string]interface{}) </span><span class="cov6" title="5">{
+                // If `if_not_set` is true, only set if missing
+                if instr.IfNotSet </span><span class="cov4" title="3">{
+                        if _, exists := input[k]; exists </span><span class="cov1" title="1">{
+                                continue</span>
+                        }
+                }
+                <span class="cov5" title="4">input[k] = v</span>
+        }
+
+        <span class="cov5" title="4">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package transform
+
+import (
+        "fmt"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type SetOperator struct{}
+
+func (s *SetOperator) Name() string <span class="cov10" title="18">{ return "set" }</span>
+
+func (s *SetOperator) Validate(instr model.Instruction) error <span class="cov7" title="7">{
+        if instr.Key == "" </span><span class="cov5" title="4">{
+                return fmt.Errorf("set operator missing 'key'")
+        }</span>
+        <span class="cov4" title="3">return nil</span>
+}
+
+func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov6" title="5">{
+        input[instr.Key] = instr.Value
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package transform
+
+import (
+        "fmt"
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type Registry struct {
+        ops map[string]Operator
+}
+
+func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov4" title="6">{
+        reg := NewRegistry()
+        reg.Register(&amp;SetOperator{})
+        reg.Register(&amp;CopyOperator{})
+        reg.Register(&amp;DeleteOperator{})
+        reg.Register(&amp;MapOperator{})
+        reg.Register(&amp;FailOperator{})
+        reg.Register(&amp;NoOperation{})
+        reg.Register(&amp;MergeOperator{})
+        reg.Register(&amp;IfOperator{})
+        for _, op := range optional </span><span class="cov4" title="5">{
+                reg.Register(op)
+        }</span>
+        <span class="cov4" title="6">return reg</span>
+}
+
+func NewRegistry() *Registry <span class="cov7" title="26">{
+        return &amp;Registry{ops: map[string]Operator{}}
+}</span>
+
+func (r *Registry) Register(op Operator) <span class="cov10" title="91">{
+        name := op.Name()
+        if name == "" </span><span class="cov1" title="1">{
+                panic("operator has no name")</span>
+        }
+        <span class="cov9" title="90">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
+                panic(fmt.Sprintf("operator with name '%s' is already registered", name))</span>
+        }
+        <span class="cov9" title="89">r.ops[name] = op</span>
+}
+
+func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool <span class="cov4" title="5">{
+        op := r.ops[instr.Op]
+        if err := op.Apply(ctx, reg, input, instr); err != nil </span><span class="cov2" title="2">{
+                return ctx.HandleError(err)
+        }</span>
+
+        <span class="cov3" title="3">return true</span>
+}
+
+func (r *Registry) Find(op string) Operator <span class="cov6" title="13">{
+        return r.ops[op]
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

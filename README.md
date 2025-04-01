@@ -61,12 +61,79 @@ Also, see our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md).
 
 ### `examples/simplest.json`
 
+**Purpose:** Show the simplest possible working example of a Ducto 'program'.
+
 ```json
 {
   "version": 1,
   "instructions": [
     {"op": "set", "key": "greeting", "value": "hello world"}
   ]
+}
+```
+
+### `examples/encrich-log.json`
+
+**Purpose:** Enrich incoming telemetry events with environment defaults, severity mapping, and drop test/debug data.
+
+#### Input:
+```json5
+{
+  "message": "Disk space low",
+  "level": "warn"
+}
+```
+
+The goal here is to:
+- Default missing `env` to `"default-env"`. 
+- Convert `"level"` into a `"severity"` field using a mapping. 
+- Remove `debug_info`. 
+- Set a `"processed": true` flag.
+
+#### Program:
+```json5
+{
+  "version": 1,
+  "instructions": [
+    
+    // Defaults
+    { "op": "coalesce", "key": "env", "value": "default-env" },
+    { "op": "coalesce", "key": "level", "value": "low" },
+
+    // Alter severity by known log levels 
+    { "op": "if", "condition": { "equals": { "key": "level", "value": "warn" } }, "then": [
+      { "op": "set", "key": "severity", "value": "medium" }
+    ]},
+    {
+      "op": "if",
+      "condition": {
+        "or": [
+          { "equals": { "key": "level", "value": "error" } },
+          { "equals": { "key": "level", "value": "critical" } }
+        ]
+      },
+      "then": [
+        { "op": "set", "key": "severity", "value": "high" }
+      ]
+    },
+
+    // Remove unnecessary keys
+    { "op": "delete", "key": "debug_info" },
+
+    // Not needed, but by set this value last we show we've finished processing this program
+    { "op": "set", "key": "processed", "value": true }
+  ]
+}
+```
+
+#### Output:
+```json5
+{
+  "message": "Disk space low",
+  "level": "warn",
+  "env": "default-env",
+  "severity": "medium",
+  "processed": true
 }
 ```
 

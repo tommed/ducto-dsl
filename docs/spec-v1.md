@@ -60,11 +60,12 @@ By default, if an operation is not successful the program will continue anyway. 
 
 The following conditions current exist:
 
-| Condition | Purpose                                                |
-|-----------|--------------------------------------------------------|
-| `exists`  | Runs if the field is present and its value is non-null |
-| `and`     | An array of conditions which all must match            |
-| `or`      | An array of conditions where at least one should match |
+| Condition | Purpose                                                 |
+|-----------|---------------------------------------------------------|
+| `exists`  | Runs if the field is present and its value is non-null  |
+| `equals`  | True if the field is present and equals a given value   |
+| `and`     | An array of conditions which all must match             |
+| `or`      | An array of conditions where at least one should match  |
 
 ## 🟣 Instruction Schema (JSON Draft)
 
