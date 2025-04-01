@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/tommed/dsl-transformer/internal/dsl"
-	"github.com/tommed/dsl-transformer/internal/model"
+	"github.com/tommed/ducto-dsl/internal/dsl"
+	"github.com/tommed/ducto-dsl/internal/model"
 	"io"
 	"os"
 )

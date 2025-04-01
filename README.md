@@ -5,10 +5,10 @@
     </a>
 </p>
 
-# DSL Transformer
+# Ducto DSL
 
-[![CI](https://github.com/tommed/dsl-transformer/actions/workflows/ci.yml/badge.svg)](https://github.com/tommed/dsl-transformer/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/tommed/dsl-transformer/branch/main/graph/badge.svg)](https://codecov.io/gh/tommed/dsl-transformer)
+[![CI](https://github.com/tommed/ducto-dsl/actions/workflows/ci.yml/badge.svg)](https://github.com/tommed/ducto-dsl/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/tommed/ducto-dsl/branch/main/graph/badge.svg)](https://codecov.io/gh/tommed/ducto-dsl)
 
 ---
 
@@ -70,19 +70,36 @@ Also, see our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md).
 }
 ```
 
-## Lint
+## Install
 
 ```bash
-go run ./cmd/transformer-cli lint examples/simplest.json
+go install github.com/tommed/ducto-dsl/cmd/ducto-dsl@latest
+
+# Run (From a file)
+ducto-dsl program.json < input.json
+
+# Run (From piped text)
+echo '{"foo": "bar"}' | ducto-dsl program.json
+
+# Lint
+ducto-dsl lint program.json
 ```
 
-## Run
+## From Source
+
+### Lint
 
 ```bash
-echo '{"foo":"bar"}' | go run ./cmd/transformer-cli examples/simplest.json
+go run ./cmd/ducto-dsl lint examples/simplest.json
 ```
 
-Output:
+### Run
+
+```bash
+echo '{"foo":"bar"}' | go run ./cmd/ducto-dsl ./examples/simplest.json
+```
+
+#### Output:
 
 ```json
 {
@@ -104,12 +121,22 @@ make test-full    # Full tests
 make coverage     # Coverage report (HTML)
 make lint-install # Install lint prerequisites
 make lint         # Run static analysis
+make clean        # Remove binaries and generated artifacts
 ```
 
 ### CLI
 
+There are [Makefile](./Makefile) targets for a macOS binary and Windows binary. Or simply build all:
+
 ```bash
-make cli-macos
+# Build all binaries
+make build-all
+
+# Build (macOS)
+make ducto-dsl-macos
+
+# Build (Microsoft Windows)
+make ducto-dsl-windows
 ```
 
 ## Status

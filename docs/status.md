@@ -2,7 +2,7 @@
 
 | Check         | Status                                                                                                                               |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| Build & Lint  | ![CI](https://github.com/tommed/dsl-transformer/actions/workflows/ci.yml/badge.svg)                                                  |
+| Build & Lint  | ![CI](https://github.com/tommed/ducto-dsl/actions/workflows/ci.yml/badge.svg)                                                  |
 | Code Coverage | [![codecov](https://codecov.io/gh/tommed/dsl-transformer/branch/main/graph/badge.svg)](https://codecov.io/gh/tommed/dsl-transformer) |
 | License       | MIT                                                                                                                                  |
 | Go Version    | 1.24+                                                                                                                                |

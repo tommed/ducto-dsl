@@ -2,7 +2,7 @@ package transform
 
 import (
 	"errors"
-	"github.com/tommed/dsl-transformer/internal/model"
+	"github.com/tommed/ducto-dsl/internal/model"
 )
 
 type FailOperator struct {

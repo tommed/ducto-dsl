@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/dsl-transformer/internal/model"
+	"github.com/tommed/ducto-dsl/internal/model"
 )
 
 func TestOperators(t *testing.T) {
@@ -108,7 +108,7 @@ func TestOperators(t *testing.T) {
 			if err == nil {
 				err = tt.op.Apply(exec, r, input, tt.instr)
 			}
-			
+
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

@@ -3,8 +3,8 @@ package dsl
 import (
 	"context"
 	"errors"
-	"github.com/tommed/dsl-transformer/internal/model"
-	"github.com/tommed/dsl-transformer/internal/transform"
+	"github.com/tommed/ducto-dsl/internal/model"
+	"github.com/tommed/ducto-dsl/internal/transform"
 )
 
 // Transformer applies DSL-defined transformations

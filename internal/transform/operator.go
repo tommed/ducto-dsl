@@ -1,7 +1,7 @@
 package transform
 
 import (
-	"github.com/tommed/dsl-transformer/internal/model"
+	"github.com/tommed/ducto-dsl/internal/model"
 )
 
 type Operator interface {

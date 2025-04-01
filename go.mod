@@ -1,4 +1,4 @@
-module github.com/tommed/dsl-transformer
+module github.com/tommed/ducto-dsl
 
 go 1.24.1
 

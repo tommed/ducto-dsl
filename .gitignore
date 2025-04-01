@@ -7,7 +7,7 @@
 *.dll
 *.so
 *.dylib
-ducto-dsl*
+./ducto-dsl*
 
 # Test binary, built with `go test -c`
 *.test
