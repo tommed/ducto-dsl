@@ -166,6 +166,44 @@ func TestIfOperator_Apply(t *testing.T) {
 			},
 			wantErr: errors.New("intention failure"),
 		},
+		{
+			name:  "condition matches but negated - should skip",
+			input: map[string]interface{}{"foo": "bar"},
+			instr: model.Instruction{
+				Op: "if",
+				Condition: map[string]interface{}{
+					"exists": "foo",
+				},
+				Not: true,
+				Then: []model.Instruction{
+					{
+						Op:    "set",
+						Key:   "ran",
+						Value: true,
+					},
+				},
+			},
+			expected: map[string]interface{}{"foo": "bar"},
+		},
+		{
+			name:  "condition does not match but negated - should run",
+			input: map[string]interface{}{"baz": "qux"},
+			instr: model.Instruction{
+				Op: "if",
+				Condition: map[string]interface{}{
+					"exists": "foo",
+				},
+				Not: true,
+				Then: []model.Instruction{
+					{
+						Op:    "set",
+						Key:   "ran",
+						Value: true,
+					},
+				},
+			},
+			expected: map[string]interface{}{"baz": "qux", "ran": true},
+		},
 	}
 
 	for _, tt := range tests {

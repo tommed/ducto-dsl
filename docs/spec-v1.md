@@ -56,9 +56,9 @@ By default, if an operation is not successful the program will continue anyway. 
 
 ### 🟡 Special Cases
 
-#### `if`
+#### If Statement
 
-The following conditions current exist:
+The following conditions currently exist:
 
 | Condition | Purpose                                                 |
 |-----------|---------------------------------------------------------|
@@ -73,7 +73,17 @@ The following conditions current exist:
 {
   "op": "set",
   "key": "string",
-  "value": "any"
+  "value": "any",
+  
+  "from": "string",
+  "to": "string",
+  
+  "regex": "bool",
+  
+  "condition": "map[string]any",
+  "not": "bool",
+  "then": "[]Instruction",
+  "if_not_set": "bool"
 }
 ```
 

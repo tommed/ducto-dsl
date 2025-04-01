@@ -348,16 +348,16 @@ import (
 //   - evaluateCondition  (implement your new condition)
 
 // validateConditions ensures the conditions map uses valid clauses
-func validateConditions(condition map[string]interface{}) error <span class="cov6" title="7">{
+func validateConditions(condition map[string]interface{}) error <span class="cov6" title="9">{
         if len(condition) == 0 </span><span class="cov1" title="1">{
                 return errors.New("no conditions defined")
         }</span>
-        <span class="cov5" title="6">if len(condition) &gt; 1 </span><span class="cov1" title="1">{
+        <span class="cov6" title="8">if len(condition) &gt; 1 </span><span class="cov1" title="1">{
                 return fmt.Errorf("only one condition type is allowed per condition block, got: %v", condition)
         }</span>
-        <span class="cov5" title="5">for key := range condition </span><span class="cov5" title="5">{
+        <span class="cov6" title="7">for key := range condition </span><span class="cov6" title="7">{
                 switch key </span>{
-                case "exists", "equals", "or", "and":<span class="cov4" title="4">
+                case "exists", "equals", "or", "and":<span class="cov5" title="6">
                         return nil</span>
                 default:<span class="cov1" title="1">
                         return fmt.Errorf("unknown condition %q", key)</span>
@@ -367,31 +367,31 @@ func validateConditions(condition map[string]interface{}) error <span class="cov
 }
 
 // evaluateCondition evaluates the conditions
-func evaluateCondition(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov10" title="26">{
+func evaluateCondition(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov10" title="28">{
         switch </span>{
-        case condition["exists"] != nil:<span class="cov7" title="10">
+        case condition["exists"] != nil:<span class="cov7" title="12">
                 return conditionExists(input, condition)</span>
-        case condition["equals"] != nil:<span class="cov7" title="9">
+        case condition["equals"] != nil:<span class="cov6" title="9">
                 return conditionEquals(input, condition)</span>
-        case condition["or"] != nil:<span class="cov4" title="3">
+        case condition["or"] != nil:<span class="cov3" title="3">
                 return conditionOr(input, condition)</span>
-        case condition["and"] != nil:<span class="cov4" title="3">
+        case condition["and"] != nil:<span class="cov3" title="3">
                 return conditionAnd(input, condition)</span>
         default:<span class="cov1" title="1">
                 return false</span>
         }
 }
 
-func conditionExists(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov7" title="10">{
+func conditionExists(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov7" title="12">{
         key, ok := condition["exists"].(string)
         if !ok </span><span class="cov1" title="1">{
                 return false
         }</span>
-        <span class="cov7" title="9">_, exists := input[key]
+        <span class="cov7" title="11">_, exists := input[key]
         return exists</span>
 }
 
-func conditionEquals(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov7" title="9">{
+func conditionEquals(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov6" title="9">{
         data, ok := condition["equals"].(map[string]interface{})
         if !ok </span><span class="cov1" title="1">{
                 return false
@@ -411,13 +411,13 @@ func conditionEquals(input map[string]interface{}, condition map[string]interfac
         <span class="cov5" title="5">return jsonEqual(actual, expected)</span>
 }
 
-func conditionOr(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov4" title="3">{
+func conditionOr(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov3" title="3">{
         conds, ok := condition["or"].([]interface{})
         if !ok </span><span class="cov1" title="1">{
                 return false
         }</span>
-        <span class="cov2" title="2">for _, c := range conds </span><span class="cov4" title="3">{
-                if sub, ok := c.(map[string]interface{}); ok </span><span class="cov4" title="3">{
+        <span class="cov2" title="2">for _, c := range conds </span><span class="cov3" title="3">{
+                if sub, ok := c.(map[string]interface{}); ok </span><span class="cov3" title="3">{
                         if evaluateCondition(input, sub) </span><span class="cov1" title="1">{
                                 return true
                         }</span>
@@ -426,7 +426,7 @@ func conditionOr(input map[string]interface{}, condition map[string]interface{})
         <span class="cov1" title="1">return false</span>
 }
 
-func conditionAnd(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov4" title="3">{
+func conditionAnd(input map[string]interface{}, condition map[string]interface{}) bool <span class="cov3" title="3">{
         conds, ok := condition["and"].([]interface{})
         if !ok </span><span class="cov1" title="1">{
                 return false
@@ -461,12 +461,12 @@ type ExecutionContext struct {
         Errors  []string // Collected if OnError = "capture"
 }
 
-func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="38">{
+func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="40">{
         if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "capture" </span><span class="cov3" title="3">{
                 onError = "ignore"
         }</span>
 
-        <span class="cov10" title="38">return &amp;ExecutionContext{
+        <span class="cov10" title="40">return &amp;ExecutionContext{
                 Ctx:     ctx,
                 OnError: onError,
                 Errors:  []string{},
@@ -625,31 +625,35 @@ import (
 
 type IfOperator struct{}
 
-func (o *IfOperator) Name() string <span class="cov8" title="6">{ return "if" }</span>
+func (o *IfOperator) Name() string <span class="cov7" title="6">{ return "if" }</span>
 
-func (o *IfOperator) Validate(instr model.Instruction) error <span class="cov10" title="9">{
+func (o *IfOperator) Validate(instr model.Instruction) error <span class="cov10" title="11">{
         if instr.Condition == nil </span><span class="cov1" title="1">{
                 return errors.New("if operator missing 'condition'")
         }</span>
-        <span class="cov9" title="8">if len(instr.Then) == 0 </span><span class="cov1" title="1">{
+        <span class="cov9" title="10">if len(instr.Then) == 0 </span><span class="cov1" title="1">{
                 return errors.New("if operator missing 'then' instructions")
         }</span>
-        <span class="cov8" title="7">if err := validateConditions(instr.Condition); err != nil </span><span class="cov5" title="3">{
+        <span class="cov9" title="9">if err := validateConditions(instr.Condition); err != nil </span><span class="cov5" title="3">{
                 return err
         }</span>
-        <span class="cov6" title="4">return nil</span>
+        <span class="cov7" title="6">return nil</span>
 }
 
-func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov5" title="3">{
-        if evaluateCondition(input, instr.Condition) </span><span class="cov3" title="2">{
-                for _, sub := range instr.Then </span><span class="cov3" title="2">{
+func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov7" title="5">{
+        conditionResult := evaluateCondition(input, instr.Condition)
+        if instr.Not </span><span class="cov3" title="2">{
+                conditionResult = !conditionResult
+        }</span>
+        <span class="cov7" title="5">if conditionResult </span><span class="cov5" title="3">{
+                for _, sub := range instr.Then </span><span class="cov5" title="3">{
                         op := reg.Find(sub.Op)
                         if err := op.Apply(ctx, reg, input, sub); err != nil </span><span class="cov1" title="1">{
                                 return err
                         }</span>
                 }
         }
-        <span class="cov3" title="2">return nil</span>
+        <span class="cov6" title="4">return nil</span>
 }
 </pre>
 		
@@ -761,7 +765,7 @@ func (s *SetOperator) Validate(instr model.Instruction) error <span class="cov7"
         <span class="cov4" title="3">return nil</span>
 }
 
-func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov6" title="5">{
+func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov6" title="6">{
         input[instr.Key] = instr.Value
         return nil
 }</span>
@@ -819,7 +823,7 @@ func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]
         <span class="cov3" title="3">return true</span>
 }
 
-func (r *Registry) Find(op string) Operator <span class="cov6" title="13">{
+func (r *Registry) Find(op string) Operator <span class="cov6" title="14">{
         return r.ops[op]
 }</span>
 </pre>
