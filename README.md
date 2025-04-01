@@ -46,7 +46,7 @@ See [doc/specs.md](docs/specs.md) for a specification of the DSL.
 - [x] Declarative `set` and `copy` operations
 - [x] Support for `map`, `delete`, `merge`
 - [x] Linter included for instruction validation
-- [ ] Conditionals
+- [x] Conditionals
 - [ ] Embeddable Go SDK
 - [ ] Input can be JSON or YAML
 - [ ] HCL-powered syntax option
