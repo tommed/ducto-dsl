@@ -67,7 +67,7 @@
 				
 				<option value="file5">github.com/tommed/ducto-dsl/internal/dsl/validate.go (100.0%)</option>
 				
-				<option value="file6">github.com/tommed/ducto-dsl/internal/transform/conditions.go (98.0%)</option>
+				<option value="file6">github.com/tommed/ducto-dsl/internal/transform/conditions.go (100.0%)</option>
 				
 				<option value="file7">github.com/tommed/ducto-dsl/internal/transform/context.go (100.0%)</option>
 				
@@ -358,12 +358,12 @@ func validateConditions(condition map[string]interface{}) error <span class="cov
         <span class="cov6" title="7">for key := range condition </span><span class="cov6" title="7">{
                 switch key </span>{
                 case "exists", "equals", "or", "and":<span class="cov5" title="6">
-                        return nil</span>
+                        break</span>
                 default:<span class="cov1" title="1">
                         return fmt.Errorf("unknown condition %q", key)</span>
                 }
         }
-        <span class="cov0" title="0">return nil</span> // impossible to reach technically
+        <span class="cov5" title="6">return nil</span> // impossible to reach technically
 }
 
 // evaluateCondition evaluates the conditions
