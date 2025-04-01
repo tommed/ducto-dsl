@@ -4,23 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/tommed/ducto-dsl/internal/dsl"
-	"github.com/tommed/ducto-dsl/model"
+	"github.com/tommed/ducto-dsl/transform"
 	"io"
-	"os"
 )
 
 //goland:noinspection GoUnhandledErrorResult
 func TransformCommand(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	progData, err := os.ReadFile(args[0])
+	prog, err := transform.LoadProgram(args[0])
 	if err != nil {
-		fmt.Fprintf(stderr, "failed to read program file: %v\n", err)
-		return 1
-	}
-
-	var prog model.Program
-	if err := json.Unmarshal(progData, &prog); err != nil {
-		fmt.Fprintf(stderr, "failed to parse program: %v\n", err)
+		fmt.Fprintf(stderr, "%s", err.Error())
 		return 1
 	}
 
@@ -30,8 +22,8 @@ func TransformCommand(args []string, stdin io.Reader, stdout io.Writer, stderr i
 		return 1
 	}
 
-	tr := dsl.New()
-	out, err := tr.Apply(context.Background(), input, &prog)
+	tr := transform.New()
+	out, err := tr.Apply(context.Background(), input, prog)
 	if err != nil {
 		fmt.Fprintf(stderr, "error: %v\n", err)
 		return 1

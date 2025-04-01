@@ -1,20 +1,19 @@
-package dsl
+package transform
 
 import (
 	"context"
 	"errors"
 	"github.com/tommed/ducto-dsl/model"
-	transform2 "github.com/tommed/ducto-dsl/transform"
 )
 
 // Transformer applies DSL-defined transformations
 type Transformer struct {
-	reg *transform2.Registry
+	reg *Registry
 }
 
 // New creates a new Transformer
 func New() *Transformer {
-	reg := transform2.NewDefaultRegistry()
+	reg := NewDefaultRegistry()
 	return &Transformer{reg: reg}
 }
 
@@ -27,7 +26,9 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 	}
 
 	// Create a new context
-	exec := transform2.NewExecutionContext(ctx, prog.OnError)
+	exec := NewExecutionContext(ctx, prog.OnError)
+	debug, _ := ctx.Value(ContextKeyDebug).(bool)
+	exec.Debug = debug
 
 	// Create our output, start with the input values
 	output := make(map[string]interface{})
@@ -45,6 +46,15 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 	// HandleError errors
 	if exec.OnError == "capture" && len(exec.Errors) > 0 {
 		output["@dsl_errors"] = exec.Errors
+	}
+
+	// Debug information
+	if exec.Debug {
+		output["@dsl_debug"] = map[string]interface{}{
+			"applied_instructions": len(prog.Instructions),
+			"errors":               len(exec.Errors),
+			// could later include operator timings, traces etc.
+		}
 	}
 
 	return output, nil

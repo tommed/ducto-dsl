@@ -1,4 +1,4 @@
-package dsl
+package transform
 
 import (
 	"context"
@@ -113,13 +113,18 @@ func TestTransformer_Apply_ErrorsReturned(t *testing.T) {
 	}
 
 	// Act
-	output, err := tr.Apply(context.Background(), input, prog)
+	ctx := context.WithValue(context.Background(), ContextKeyDebug, true)
+	output, err := tr.Apply(ctx, input, prog)
 
 	// Assert
 	assert.NoError(t, err) // should have been ignored due to OnError value
 	errorList, ok := output["@dsl_errors"].([]string)
 	assert.True(t, ok)
 	assert.Len(t, errorList, 1)
+
+	debugInfo, ok := output["@dsl_debug"].(map[string]interface{})
+	assert.True(t, ok)
+	assert.Len(t, debugInfo, 2)
 }
 
 func TestTransformer_Apply_FailOnError(t *testing.T) {

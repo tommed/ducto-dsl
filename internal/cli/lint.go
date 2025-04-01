@@ -3,7 +3,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tommed/ducto-dsl/internal/dsl"
 	"github.com/tommed/ducto-dsl/model"
 	"github.com/tommed/ducto-dsl/transform"
 	"os"
@@ -33,7 +32,7 @@ func LintCommand(args []string) int {
 
 	// Validate program
 	reg := transform.NewDefaultRegistry()
-	if err := dsl.ValidateProgram(reg, &prog); err != nil {
+	if err := transform.ValidateProgram(reg, &prog); err != nil {
 		fmt.Fprintf(os.Stderr, "program validation failed: %v\n", err)
 		return 1
 	}
