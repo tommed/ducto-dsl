@@ -75,9 +75,10 @@ Also, see our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md).
 ```bash
 go install github.com/tommed/ducto-dsl/cmd/ducto-dsl@latest
 
-# Run from a file
+# Run (From a file)
 ducto-dsl program.json < input.json
-# Or piping stdout into stdin
+
+# Run (From piped text)
 echo '{"foo": "bar"}' | ducto-dsl program.json
 
 # Lint
@@ -120,6 +121,7 @@ make test-full    # Full tests
 make coverage     # Coverage report (HTML)
 make lint-install # Install lint prerequisites
 make lint         # Run static analysis
+make clean        # Remove binaries and generated artifacts
 ```
 
 ### CLI
@@ -127,8 +129,14 @@ make lint         # Run static analysis
 There are [Makefile](./Makefile) targets for a macOS binary and Windows binary. Or simply build all:
 
 ```bash
-make 
+# Build all binaries
 make build-all
+
+# Build (macOS)
+make ducto-dsl-macos
+
+# Build (Microsoft Windows)
+make ducto-dsl-windows
 ```
 
 ## Status
