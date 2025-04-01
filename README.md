@@ -90,13 +90,13 @@ ducto-dsl lint program.json
 ### Lint
 
 ```bash
-go run ./cmd/ducto-cli lint examples/simplest.json
+go run ./cmd/ducto-dsl lint examples/simplest.json
 ```
 
 ### Run
 
 ```bash
-echo '{"foo":"bar"}' | go run ./cmd/ducto-cli ./examples/simplest.json
+echo '{"foo":"bar"}' | go run ./cmd/ducto-dsl ./examples/simplest.json
 ```
 
 #### Output:
