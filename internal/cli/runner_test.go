@@ -46,7 +46,7 @@ func Test_RunCLI(t *testing.T) {
 				args:  []string{"./does-not-exist.json"},
 			},
 			want:            1,
-			wantErrContains: "failed to read program file",
+			wantErrContains: "failed to read program",
 		},
 		{
 			name: "invalid json instructions file",

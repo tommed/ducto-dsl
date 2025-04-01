@@ -1,12 +1,11 @@
-package dsl
+package transform
 
 import (
 	"fmt"
 	"github.com/tommed/ducto-dsl/model"
-	"github.com/tommed/ducto-dsl/transform"
 )
 
-func ValidateProgram(r *transform.Registry, prog *model.Program) error {
+func ValidateProgram(r *Registry, prog *model.Program) error {
 	if prog == nil {
 		return fmt.Errorf("program is nil")
 	}

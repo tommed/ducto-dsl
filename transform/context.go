@@ -4,11 +4,20 @@ import (
 	"context"
 )
 
+type contextKey string
+
+const ContextKeyDebug contextKey = "ducto-debug"
+
 type ExecutionContext struct {
 	Ctx context.Context
 
 	OnError string   // "ignore", "fail", "capture"
 	Errors  []string // Collected if OnError = "capture"
+
+	// Debug flag
+	Debug bool
+
+	// Future: you could add TraceID, Logger, Metrics, etc.
 }
 
 func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext {

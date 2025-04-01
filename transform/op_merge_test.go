@@ -2,7 +2,6 @@ package transform_test
 
 import (
 	"context"
-	"github.com/tommed/ducto-dsl/internal/dsl"
 	"github.com/tommed/ducto-dsl/model"
 	transform2 "github.com/tommed/ducto-dsl/transform"
 	"testing"
@@ -76,7 +75,7 @@ func TestMergeOperator_Apply(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := transform2.NewExecutionContext(context.Background(), "fail")
-			err := dsl.ValidateProgram(reg, &model.Program{
+			err := transform2.ValidateProgram(reg, &model.Program{
 				Version:      1,
 				OnError:      "fail",
 				Instructions: []model.Instruction{tt.instr},
