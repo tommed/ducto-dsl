@@ -1,7 +1,13 @@
+<!--suppress HtmlDeprecatedAttribute -->
+<p align="right">
+    <a href="https://github.com/tommed" title="See Project Ducto">
+        <img src="../assets/ducto-logo-small.png" alt="A part of Project Ducto"/>
+    </a>
+</p>
+
 # DSL Transformer — Specification (Draft v1)
 
-## Purpose
-A declarative, embeddable DSL for transforming structured data (JSON-like objects) through composable instructions.
+> A declarative, embeddable DSL for transforming structured data (JSON-like objects) through composable instructions.
 
 ## 🟣 Core Concepts
 

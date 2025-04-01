@@ -3,7 +3,7 @@ package dsl
 import (
 	"context"
 	"errors"
-	"github.com/tommed/ducto-dsl/internal/model"
+	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

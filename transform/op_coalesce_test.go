@@ -2,11 +2,11 @@ package transform
 
 import (
 	"context"
+	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tommed/ducto-dsl/internal/model"
 )
 
 func TestCoalesceOperator_Validate(t *testing.T) {

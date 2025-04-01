@@ -2,7 +2,7 @@ package transform
 
 import (
 	"fmt"
-	"github.com/tommed/ducto-dsl/internal/model"
+	"github.com/tommed/ducto-dsl/model"
 )
 
 type MergeOperator struct{}

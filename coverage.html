@@ -67,29 +67,29 @@
 				
 				<option value="file5">github.com/tommed/ducto-dsl/internal/dsl/validate.go (100.0%)</option>
 				
-				<option value="file6">github.com/tommed/ducto-dsl/internal/transform/conditions.go (100.0%)</option>
+				<option value="file6">github.com/tommed/ducto-dsl/transform/conditions.go (100.0%)</option>
 				
-				<option value="file7">github.com/tommed/ducto-dsl/internal/transform/context.go (100.0%)</option>
+				<option value="file7">github.com/tommed/ducto-dsl/transform/context.go (100.0%)</option>
 				
-				<option value="file8">github.com/tommed/ducto-dsl/internal/transform/noop.go (100.0%)</option>
+				<option value="file8">github.com/tommed/ducto-dsl/transform/noop.go (100.0%)</option>
 				
-				<option value="file9">github.com/tommed/ducto-dsl/internal/transform/op_coalesce.go (100.0%)</option>
+				<option value="file9">github.com/tommed/ducto-dsl/transform/op_coalesce.go (100.0%)</option>
 				
-				<option value="file10">github.com/tommed/ducto-dsl/internal/transform/op_copy.go (100.0%)</option>
+				<option value="file10">github.com/tommed/ducto-dsl/transform/op_copy.go (100.0%)</option>
 				
-				<option value="file11">github.com/tommed/ducto-dsl/internal/transform/op_delete.go (100.0%)</option>
+				<option value="file11">github.com/tommed/ducto-dsl/transform/op_delete.go (100.0%)</option>
 				
-				<option value="file12">github.com/tommed/ducto-dsl/internal/transform/op_fail.go (100.0%)</option>
+				<option value="file12">github.com/tommed/ducto-dsl/transform/op_fail.go (100.0%)</option>
 				
-				<option value="file13">github.com/tommed/ducto-dsl/internal/transform/op_if.go (100.0%)</option>
+				<option value="file13">github.com/tommed/ducto-dsl/transform/op_if.go (100.0%)</option>
 				
-				<option value="file14">github.com/tommed/ducto-dsl/internal/transform/op_map.go (100.0%)</option>
+				<option value="file14">github.com/tommed/ducto-dsl/transform/op_map.go (100.0%)</option>
 				
-				<option value="file15">github.com/tommed/ducto-dsl/internal/transform/op_merge.go (100.0%)</option>
+				<option value="file15">github.com/tommed/ducto-dsl/transform/op_merge.go (100.0%)</option>
 				
-				<option value="file16">github.com/tommed/ducto-dsl/internal/transform/op_set.go (100.0%)</option>
+				<option value="file16">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
 				
-				<option value="file17">github.com/tommed/ducto-dsl/internal/transform/registry.go (100.0%)</option>
+				<option value="file17">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -130,8 +130,8 @@ import (
         "encoding/json"
         "fmt"
         "github.com/tommed/ducto-dsl/internal/dsl"
-        "github.com/tommed/ducto-dsl/internal/model"
-        "github.com/tommed/ducto-dsl/internal/transform"
+        "github.com/tommed/ducto-dsl/model"
+        "github.com/tommed/ducto-dsl/transform"
         "os"
 )
 
@@ -201,7 +201,7 @@ import (
         "encoding/json"
         "fmt"
         "github.com/tommed/ducto-dsl/internal/dsl"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
         "io"
         "os"
 )
@@ -245,18 +245,18 @@ func TransformCommand(args []string, stdin io.Reader, stdout io.Writer, stderr i
 import (
         "context"
         "errors"
-        "github.com/tommed/ducto-dsl/internal/model"
-        "github.com/tommed/ducto-dsl/internal/transform"
+        "github.com/tommed/ducto-dsl/model"
+        transform2 "github.com/tommed/ducto-dsl/transform"
 )
 
 // Transformer applies DSL-defined transformations
 type Transformer struct {
-        reg *transform.Registry
+        reg *transform2.Registry
 }
 
 // New creates a new Transformer
 func New() *Transformer <span class="cov10" title="8">{
-        reg := transform.NewDefaultRegistry()
+        reg := transform2.NewDefaultRegistry()
         return &amp;Transformer{reg: reg}
 }</span>
 
@@ -269,7 +269,7 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
         }</span>
 
         // Create a new context
-        <span class="cov7" title="4">exec := transform.NewExecutionContext(ctx, prog.OnError)
+        <span class="cov7" title="4">exec := transform2.NewExecutionContext(ctx, prog.OnError)
 
         // Create our output, start with the input values
         output := make(map[string]interface{})
@@ -297,8 +297,8 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/internal/model"
-        "github.com/tommed/ducto-dsl/internal/transform"
+        "github.com/tommed/ducto-dsl/model"
+        "github.com/tommed/ducto-dsl/transform"
 )
 
 func ValidateProgram(r *transform.Registry, prog *model.Program) error <span class="cov10" title="11">{
@@ -494,7 +494,9 @@ func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov5" titl
 		
 		<pre class="file" id="file8" style="display: none">package transform
 
-import "github.com/tommed/ducto-dsl/internal/model"
+import (
+        "github.com/tommed/ducto-dsl/model"
+)
 
 // NoOperation is our nil implementation, it literally does nothing and never fails
 type NoOperation struct{}
@@ -516,8 +518,7 @@ func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interf
 
 import (
         "errors"
-
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type CoalesceOperator struct{}
@@ -546,7 +547,7 @@ func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[str
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type CopyOperator struct{}
@@ -573,7 +574,7 @@ func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type DeleteOperator struct{}
@@ -597,7 +598,7 @@ func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[strin
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type FailOperator struct {
@@ -620,7 +621,7 @@ func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]inter
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type IfOperator struct{}
@@ -661,7 +662,7 @@ func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[strin
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type MapOperator struct{}
@@ -713,7 +714,7 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type MergeOperator struct{}
@@ -751,7 +752,7 @@ func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type SetOperator struct{}
@@ -775,7 +776,7 @@ func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]i
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/internal/model"
+        "github.com/tommed/ducto-dsl/model"
 )
 
 type Registry struct {

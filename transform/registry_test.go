@@ -3,7 +3,7 @@ package transform
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/internal/model"
+	"github.com/tommed/ducto-dsl/model"
 	"testing"
 )
 

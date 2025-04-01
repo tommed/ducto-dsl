@@ -3,11 +3,11 @@ package transform_test
 import (
 	"context"
 	"github.com/tommed/ducto-dsl/internal/dsl"
+	"github.com/tommed/ducto-dsl/model"
+	transform2 "github.com/tommed/ducto-dsl/transform"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/internal/model"
-	"github.com/tommed/ducto-dsl/internal/transform"
 )
 
 func TestMergeOperator_Apply(t *testing.T) {
@@ -70,12 +70,12 @@ func TestMergeOperator_Apply(t *testing.T) {
 		},
 	}
 
-	op := &transform.MergeOperator{}
-	reg := transform.NewRegistry()
-	reg.Register(&transform.MergeOperator{})
+	op := &transform2.MergeOperator{}
+	reg := transform2.NewRegistry()
+	reg.Register(&transform2.MergeOperator{})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := transform.NewExecutionContext(context.Background(), "fail")
+			ctx := transform2.NewExecutionContext(context.Background(), "fail")
 			err := dsl.ValidateProgram(reg, &model.Program{
 				Version:      1,
 				OnError:      "fail",

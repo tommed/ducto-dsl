@@ -3,18 +3,18 @@ package dsl
 import (
 	"context"
 	"errors"
-	"github.com/tommed/ducto-dsl/internal/model"
-	"github.com/tommed/ducto-dsl/internal/transform"
+	"github.com/tommed/ducto-dsl/model"
+	transform2 "github.com/tommed/ducto-dsl/transform"
 )
 
 // Transformer applies DSL-defined transformations
 type Transformer struct {
-	reg *transform.Registry
+	reg *transform2.Registry
 }
 
 // New creates a new Transformer
 func New() *Transformer {
-	reg := transform.NewDefaultRegistry()
+	reg := transform2.NewDefaultRegistry()
 	return &Transformer{reg: reg}
 }
 
@@ -27,7 +27,7 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 	}
 
 	// Create a new context
-	exec := transform.NewExecutionContext(ctx, prog.OnError)
+	exec := transform2.NewExecutionContext(ctx, prog.OnError)
 
 	// Create our output, start with the input values
 	output := make(map[string]interface{})
