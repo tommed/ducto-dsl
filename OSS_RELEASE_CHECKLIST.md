@@ -32,6 +32,6 @@
     - [x] Pass `make test` cleanly
 
 ## Announcement Plan
-[ ] Prepare blog or video
-[ ] Prepare `Show HN` or `r/golang` post
-[ ] Make sure the README answers: Who is this for? Why use it?
+- [ ] Prepare blog or video
+- [ ] Prepare `Show HN` or `r/golang` post
+- [ ] Make sure the README answers: Who is this for? Why use it?
