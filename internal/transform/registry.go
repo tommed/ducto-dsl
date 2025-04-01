@@ -19,6 +19,7 @@ func NewDefaultRegistry(optional ...Operator) *Registry {
 	reg.Register(&NoOperation{})
 	reg.Register(&MergeOperator{})
 	reg.Register(&IfOperator{})
+	reg.Register(&CoalesceOperator{})
 	for _, op := range optional {
 		reg.Register(op)
 	}

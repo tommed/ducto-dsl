@@ -73,21 +73,23 @@
 				
 				<option value="file8">github.com/tommed/ducto-dsl/internal/transform/noop.go (100.0%)</option>
 				
-				<option value="file9">github.com/tommed/ducto-dsl/internal/transform/op_copy.go (100.0%)</option>
+				<option value="file9">github.com/tommed/ducto-dsl/internal/transform/op_coalesce.go (100.0%)</option>
 				
-				<option value="file10">github.com/tommed/ducto-dsl/internal/transform/op_delete.go (100.0%)</option>
+				<option value="file10">github.com/tommed/ducto-dsl/internal/transform/op_copy.go (100.0%)</option>
 				
-				<option value="file11">github.com/tommed/ducto-dsl/internal/transform/op_fail.go (100.0%)</option>
+				<option value="file11">github.com/tommed/ducto-dsl/internal/transform/op_delete.go (100.0%)</option>
 				
-				<option value="file12">github.com/tommed/ducto-dsl/internal/transform/op_if.go (100.0%)</option>
+				<option value="file12">github.com/tommed/ducto-dsl/internal/transform/op_fail.go (100.0%)</option>
 				
-				<option value="file13">github.com/tommed/ducto-dsl/internal/transform/op_map.go (100.0%)</option>
+				<option value="file13">github.com/tommed/ducto-dsl/internal/transform/op_if.go (100.0%)</option>
 				
-				<option value="file14">github.com/tommed/ducto-dsl/internal/transform/op_merge.go (100.0%)</option>
+				<option value="file14">github.com/tommed/ducto-dsl/internal/transform/op_map.go (100.0%)</option>
 				
-				<option value="file15">github.com/tommed/ducto-dsl/internal/transform/op_set.go (100.0%)</option>
+				<option value="file15">github.com/tommed/ducto-dsl/internal/transform/op_merge.go (100.0%)</option>
 				
-				<option value="file16">github.com/tommed/ducto-dsl/internal/transform/registry.go (100.0%)</option>
+				<option value="file16">github.com/tommed/ducto-dsl/internal/transform/op_set.go (100.0%)</option>
+				
+				<option value="file17">github.com/tommed/ducto-dsl/internal/transform/registry.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -459,12 +461,12 @@ type ExecutionContext struct {
         Errors  []string // Collected if OnError = "capture"
 }
 
-func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="36">{
+func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="38">{
         if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "capture" </span><span class="cov3" title="3">{
                 onError = "ignore"
         }</span>
 
-        <span class="cov10" title="36">return &amp;ExecutionContext{
+        <span class="cov10" title="38">return &amp;ExecutionContext{
                 Ctx:     ctx,
                 OnError: onError,
                 Errors:  []string{},
@@ -476,7 +478,7 @@ func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov5" titl
                 return true // no-op
         }</span>
 
-        <span class="cov5" title="5">switch ctx.OnError </span>{
+        <span class="cov4" title="5">switch ctx.OnError </span>{
         case "fail":<span class="cov2" title="2">
                 return false</span>
         case "capture":<span class="cov1" title="1">
@@ -514,6 +516,36 @@ func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interf
 
 import (
         "errors"
+
+        "github.com/tommed/ducto-dsl/internal/model"
+)
+
+type CoalesceOperator struct{}
+
+func (o *CoalesceOperator) Name() string <span class="cov10" title="6">{ return "coalesce" }</span>
+
+func (o *CoalesceOperator) Validate(instr model.Instruction) error <span class="cov9" title="5">{
+        if instr.Key == "" </span><span class="cov1" title="1">{
+                return errors.New("coalesce operator requires a key")
+        }</span>
+        <span class="cov7" title="4">if instr.Value == nil </span><span class="cov1" title="1">{
+                return errors.New("coalesce operator requires a default value")
+        }</span>
+        <span class="cov6" title="3">return nil</span>
+}
+
+func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov4" title="2">{
+        if _, ok := input[instr.Key]; !ok </span><span class="cov1" title="1">{
+                input[instr.Key] = instr.Value
+        }</span>
+        <span class="cov4" title="2">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package transform
+
+import (
+        "errors"
         "github.com/tommed/ducto-dsl/internal/model"
 )
 
@@ -537,7 +569,7 @@ func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]
 }</span>
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package transform
+		<pre class="file" id="file11" style="display: none">package transform
 
 import (
         "errors"
@@ -561,7 +593,7 @@ func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[strin
 }</span>
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package transform
+		<pre class="file" id="file12" style="display: none">package transform
 
 import (
         "errors"
@@ -584,7 +616,7 @@ func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]inter
 }</span>
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package transform
+		<pre class="file" id="file13" style="display: none">package transform
 
 import (
         "errors"
@@ -621,7 +653,7 @@ func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[strin
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package transform
+		<pre class="file" id="file14" style="display: none">package transform
 
 import (
         "fmt"
@@ -673,7 +705,7 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package transform
+		<pre class="file" id="file15" style="display: none">package transform
 
 import (
         "fmt"
@@ -711,7 +743,7 @@ func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package transform
+		<pre class="file" id="file16" style="display: none">package transform
 
 import (
         "fmt"
@@ -735,7 +767,7 @@ func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]i
 }</span>
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package transform
+		<pre class="file" id="file17" style="display: none">package transform
 
 import (
         "fmt"
@@ -756,6 +788,7 @@ func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov4" title
         reg.Register(&amp;NoOperation{})
         reg.Register(&amp;MergeOperator{})
         reg.Register(&amp;IfOperator{})
+        reg.Register(&amp;CoalesceOperator{})
         for _, op := range optional </span><span class="cov4" title="5">{
                 reg.Register(op)
         }</span>
@@ -766,15 +799,15 @@ func NewRegistry() *Registry <span class="cov7" title="26">{
         return &amp;Registry{ops: map[string]Operator{}}
 }</span>
 
-func (r *Registry) Register(op Operator) <span class="cov10" title="91">{
+func (r *Registry) Register(op Operator) <span class="cov10" title="97">{
         name := op.Name()
         if name == "" </span><span class="cov1" title="1">{
                 panic("operator has no name")</span>
         }
-        <span class="cov9" title="90">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
+        <span class="cov9" title="96">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
                 panic(fmt.Sprintf("operator with name '%s' is already registered", name))</span>
         }
-        <span class="cov9" title="89">r.ops[name] = op</span>
+        <span class="cov9" title="95">r.ops[name] = op</span>
 }
 
 func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool <span class="cov4" title="5">{
