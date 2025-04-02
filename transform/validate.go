@@ -2,10 +2,9 @@ package transform
 
 import (
 	"fmt"
-	"github.com/tommed/ducto-dsl/model"
 )
 
-func ValidateProgram(r *Registry, prog *model.Program) error {
+func ValidateProgram(r *Registry, prog *Program) error {
 	if prog == nil {
 		return fmt.Errorf("program is nil")
 	}
@@ -25,7 +24,7 @@ func ValidateProgram(r *Registry, prog *model.Program) error {
 
 		// Validate nested instructions (e.g., map, if)
 		if len(instr.Then) > 0 {
-			subProg := &model.Program{
+			subProg := &Program{
 				Version:      prog.Version,
 				Instructions: instr.Then,
 			}

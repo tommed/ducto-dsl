@@ -3,7 +3,6 @@ package transform
 import (
 	"context"
 	"errors"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,9 +14,9 @@ func TestTransformer_Apply_NoOp(t *testing.T) {
 
 	input := map[string]interface{}{"foo": "bar"}
 
-	prog := &model.Program{
+	prog := &Program{
 		Version: 1,
-		Instructions: []model.Instruction{
+		Instructions: []Instruction{
 			{Op: "set", Key: "greeting", Value: "hello world"},
 		},
 	}
@@ -36,10 +35,10 @@ func TestTransformer_Apply_InvalidOp(t *testing.T) {
 	tr := New()
 	input := map[string]interface{}{"foo": "bar"}
 
-	prog := &model.Program{
+	prog := &Program{
 		Version: 1,
 		OnError: "fail",
-		Instructions: []model.Instruction{
+		Instructions: []Instruction{
 			{Op: "invalid-op", Key: "foo", Value: 2},
 		},
 	}
@@ -84,7 +83,7 @@ func TestTransformer_Apply_WrongVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			program := &model.Program{
+			program := &Program{
 				OnError: "fail",
 				Version: tt.args.version,
 			}
@@ -106,10 +105,10 @@ func TestTransformer_Apply_ErrorsReturned(t *testing.T) {
 	tr := New()
 	input := map[string]interface{}{}
 
-	prog := &model.Program{
+	prog := &Program{
 		Version:      1,
 		OnError:      "capture",
-		Instructions: []model.Instruction{{Op: "fail", Value: "Failed on purpose"}},
+		Instructions: []Instruction{{Op: "fail", Value: "Failed on purpose"}},
 	}
 
 	// Act
@@ -132,10 +131,10 @@ func TestTransformer_Apply_FailOnError(t *testing.T) {
 	tr := New()
 	input := map[string]interface{}{}
 
-	prog := &model.Program{
+	prog := &Program{
 		Version:      1,
 		OnError:      "fail",
-		Instructions: []model.Instruction{{Op: "fail", Value: "Failed on purpose"}},
+		Instructions: []Instruction{{Op: "fail", Value: "Failed on purpose"}},
 	}
 
 	// Act

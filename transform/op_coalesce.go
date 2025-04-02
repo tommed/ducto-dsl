@@ -2,14 +2,13 @@ package transform
 
 import (
 	"errors"
-	"github.com/tommed/ducto-dsl/model"
 )
 
 type CoalesceOperator struct{}
 
 func (o *CoalesceOperator) Name() string { return "coalesce" }
 
-func (o *CoalesceOperator) Validate(instr model.Instruction) error {
+func (o *CoalesceOperator) Validate(instr Instruction) error {
 	if instr.Key == "" {
 		return errors.New("coalesce operator requires a key")
 	}
@@ -19,7 +18,7 @@ func (o *CoalesceOperator) Validate(instr model.Instruction) error {
 	return nil
 }
 
-func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error {
+func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error {
 	if _, ok := input[instr.Key]; !ok {
 		input[instr.Key] = instr.Value
 	}

@@ -3,7 +3,6 @@ package transform
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 )
 
@@ -14,7 +13,7 @@ func TestLoadProgram(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *model.Program
+		want    *Program
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
@@ -25,10 +24,10 @@ func TestLoadProgram(t *testing.T) {
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return err == nil
 			},
-			want: &model.Program{
+			want: &Program{
 				Version: 1,
 				OnError: "fail",
-				Instructions: []model.Instruction{
+				Instructions: []Instruction{
 					{
 						Op:    "set",
 						Key:   "greeting",

@@ -2,12 +2,11 @@ package transform
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 )
 
 func TestFailOperator(t *testing.T) {
 	op := &FailOperator{}
-	err := op.Validate(model.Instruction{Op: "fail", Value: "Failed on purpose"})
+	err := op.Validate(Instruction{Op: "fail", Value: "Failed on purpose"})
 	assert.NoError(t, err)
 }

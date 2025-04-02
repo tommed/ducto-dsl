@@ -2,14 +2,13 @@ package transform
 
 import (
 	"errors"
-	"github.com/tommed/ducto-dsl/model"
 )
 
 type IfOperator struct{}
 
 func (o *IfOperator) Name() string { return "if" }
 
-func (o *IfOperator) Validate(instr model.Instruction) error {
+func (o *IfOperator) Validate(instr Instruction) error {
 	if instr.Condition == nil {
 		return errors.New("if operator missing 'condition'")
 	}
@@ -22,7 +21,7 @@ func (o *IfOperator) Validate(instr model.Instruction) error {
 	return nil
 }
 
-func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error {
+func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) error {
 	conditionResult := evaluateCondition(input, instr.Condition)
 	if instr.Not {
 		conditionResult = !conditionResult

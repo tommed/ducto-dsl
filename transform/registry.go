@@ -2,7 +2,6 @@ package transform
 
 import (
 	"fmt"
-	"github.com/tommed/ducto-dsl/model"
 )
 
 type Registry struct {
@@ -41,7 +40,7 @@ func (r *Registry) Register(op Operator) {
 	r.ops[name] = op
 }
 
-func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool {
+func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) bool {
 	op := r.ops[instr.Op]
 	if err := op.Apply(ctx, reg, input, instr); err != nil {
 		return ctx.HandleError(err)

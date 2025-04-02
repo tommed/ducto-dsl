@@ -1,4 +1,4 @@
-package model
+package transform
 
 type Program struct {
 	Version      int           `json:"version"`

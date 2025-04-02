@@ -3,7 +3,6 @@ package transform
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 )
 
@@ -46,7 +45,7 @@ func TestRegistry_Apply(t *testing.T) {
 	type args struct {
 		onError string
 		input   map[string]interface{}
-		instr   model.Instruction
+		instr   Instruction
 	}
 	tests := []struct {
 		name        string
@@ -59,7 +58,7 @@ func TestRegistry_Apply(t *testing.T) {
 			args: args{
 				onError: "fail",
 				input:   map[string]interface{}{},
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:    "set",
 					Key:   "a",
 					Value: 123,
@@ -73,7 +72,7 @@ func TestRegistry_Apply(t *testing.T) {
 			args: args{
 				onError: "fail",
 				input:   map[string]interface{}{},
-				instr: model.Instruction{
+				instr: Instruction{
 					Op: "invalid_op",
 				},
 			},
@@ -85,7 +84,7 @@ func TestRegistry_Apply(t *testing.T) {
 			args: args{
 				onError: "fail",
 				input:   map[string]interface{}{},
-				instr: model.Instruction{
+				instr: Instruction{
 					Op: "set",
 					// No Key or Value so invalid
 				},
@@ -98,7 +97,7 @@ func TestRegistry_Apply(t *testing.T) {
 			args: args{
 				onError: "capture",
 				input:   map[string]interface{}{},
-				instr: model.Instruction{
+				instr: Instruction{
 					Op: "invalid_op",
 				},
 			},
@@ -110,10 +109,10 @@ func TestRegistry_Apply(t *testing.T) {
 			args: args{
 				onError: "fail",
 				input:   map[string]interface{}{},
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "a", // doesn't exist on input
-					Then: []model.Instruction{{Op: "noop"}},
+					Then: []Instruction{{Op: "noop"}},
 				},
 			},
 			wantSuccess: false, // because this is validated not run on `apply`

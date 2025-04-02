@@ -2,7 +2,6 @@ package transform_test
 
 import (
 	"context"
-	"github.com/tommed/ducto-dsl/model"
 	transform2 "github.com/tommed/ducto-dsl/transform"
 	"testing"
 
@@ -13,14 +12,14 @@ func TestMergeOperator_Apply(t *testing.T) {
 	tests := []struct {
 		name      string
 		input     map[string]interface{}
-		instr     model.Instruction
+		instr     transform2.Instruction
 		want      map[string]interface{}
 		wantError bool
 	}{
 		{
 			name:  "basic merge",
 			input: map[string]interface{}{"foo": 1},
-			instr: model.Instruction{
+			instr: transform2.Instruction{
 				Op:    "merge",
 				Value: map[string]interface{}{"bar": 2},
 			},
@@ -29,7 +28,7 @@ func TestMergeOperator_Apply(t *testing.T) {
 		{
 			name:  "overwrites existing",
 			input: map[string]interface{}{"foo": 1},
-			instr: model.Instruction{
+			instr: transform2.Instruction{
 				Op:    "merge",
 				Value: map[string]interface{}{"foo": 999},
 			},
@@ -38,7 +37,7 @@ func TestMergeOperator_Apply(t *testing.T) {
 		{
 			name:  "if_not_set prevents overwrite",
 			input: map[string]interface{}{"foo": 1},
-			instr: model.Instruction{
+			instr: transform2.Instruction{
 				Op:       "merge",
 				IfNotSet: true,
 				Value:    map[string]interface{}{"foo": 999, "bar": 2},
@@ -48,7 +47,7 @@ func TestMergeOperator_Apply(t *testing.T) {
 		{
 			name:  "if_not_set works on missing keys",
 			input: map[string]interface{}{},
-			instr: model.Instruction{
+			instr: transform2.Instruction{
 				Op:       "merge",
 				IfNotSet: true,
 				Value:    map[string]interface{}{"foo": 42},
@@ -58,13 +57,13 @@ func TestMergeOperator_Apply(t *testing.T) {
 		{
 			name:      "error on missing value",
 			input:     map[string]interface{}{},
-			instr:     model.Instruction{Op: "merge"},
+			instr:     transform2.Instruction{Op: "merge"},
 			wantError: true,
 		},
 		{
 			name:      "error on non-map value",
 			input:     map[string]interface{}{},
-			instr:     model.Instruction{Op: "merge", Value: "not-a-map"},
+			instr:     transform2.Instruction{Op: "merge", Value: "not-a-map"},
 			wantError: true,
 		},
 	}
@@ -75,10 +74,10 @@ func TestMergeOperator_Apply(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := transform2.NewExecutionContext(context.Background(), "fail")
-			err := transform2.ValidateProgram(reg, &model.Program{
+			err := transform2.ValidateProgram(reg, &transform2.Program{
 				Version:      1,
 				OnError:      "fail",
-				Instructions: []model.Instruction{tt.instr},
+				Instructions: []transform2.Instruction{tt.instr},
 			})
 			if err == nil {
 				err = op.Apply(ctx, reg, tt.input, tt.instr)

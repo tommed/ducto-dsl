@@ -3,7 +3,6 @@ package transform
 import (
 	"context"
 	"errors"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,7 +12,7 @@ import (
 func TestIfOperator_Validate(t *testing.T) {
 	op := &IfOperator{}
 	type args struct {
-		instr model.Instruction
+		instr Instruction
 	}
 	var tests = []struct {
 		name string
@@ -23,9 +22,9 @@ func TestIfOperator_Validate(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "if",
-					Then: []model.Instruction{{Op: "noop"}},
+					Then: []Instruction{{Op: "noop"}},
 					Condition: map[string]interface{}{
 						"equals": map[string]interface{}{
 							"key":   "a",
@@ -38,9 +37,9 @@ func TestIfOperator_Validate(t *testing.T) {
 		{
 			name: "no condition",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "if",
-					Then: []model.Instruction{{Op: "noop"}},
+					Then: []Instruction{{Op: "noop"}},
 				},
 			},
 			want: errors.New("if operator missing 'condition'"),
@@ -48,7 +47,7 @@ func TestIfOperator_Validate(t *testing.T) {
 		{
 			name: "no then",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op: "if",
 					Condition: map[string]interface{}{
 						"equals": map[string]interface{}{
@@ -63,9 +62,9 @@ func TestIfOperator_Validate(t *testing.T) {
 		{
 			name: "empty conditions",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:        "if",
-					Then:      []model.Instruction{{Op: "noop"}},
+					Then:      []Instruction{{Op: "noop"}},
 					Condition: map[string]interface{}{},
 				},
 			},
@@ -74,9 +73,9 @@ func TestIfOperator_Validate(t *testing.T) {
 		{
 			name: "multiple conditions",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "if",
-					Then: []model.Instruction{{Op: "noop"}},
+					Then: []Instruction{{Op: "noop"}},
 					Condition: map[string]interface{}{
 						"equals": "",
 						"exists": "",
@@ -88,9 +87,9 @@ func TestIfOperator_Validate(t *testing.T) {
 		{
 			name: "invalid condition",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "if",
-					Then: []model.Instruction{{Op: "noop"}},
+					Then: []Instruction{{Op: "noop"}},
 					Condition: map[string]interface{}{
 						"invalid": "",
 					},
@@ -114,19 +113,19 @@ func TestIfOperator_Apply(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    map[string]interface{}
-		instr    model.Instruction
+		instr    Instruction
 		expected map[string]interface{}
 		wantErr  error
 	}{
 		{
 			name:  "condition matches - executes then block",
 			input: map[string]interface{}{"foo": "bar"},
-			instr: model.Instruction{
+			instr: Instruction{
 				Op: "if",
 				Condition: map[string]interface{}{
 					"exists": "foo",
 				},
-				Then: []model.Instruction{
+				Then: []Instruction{
 					{
 						Op:    "set",
 						Key:   "ran",
@@ -139,12 +138,12 @@ func TestIfOperator_Apply(t *testing.T) {
 		{
 			name:  "condition does not match - no then executed",
 			input: map[string]interface{}{"baz": "qux"},
-			instr: model.Instruction{
+			instr: Instruction{
 				Op: "if",
 				Condition: map[string]interface{}{
 					"exists": "foo",
 				},
-				Then: []model.Instruction{
+				Then: []Instruction{
 					{
 						Op:    "set",
 						Key:   "ran",
@@ -157,25 +156,25 @@ func TestIfOperator_Apply(t *testing.T) {
 		{
 			name:  "sub failure",
 			input: map[string]interface{}{"baz": "qux"},
-			instr: model.Instruction{
+			instr: Instruction{
 				Op: "if",
 				Condition: map[string]interface{}{
 					"exists": "baz",
 				},
-				Then: []model.Instruction{{Op: "fail", Value: "intention failure"}},
+				Then: []Instruction{{Op: "fail", Value: "intention failure"}},
 			},
 			wantErr: errors.New("intention failure"),
 		},
 		{
 			name:  "condition matches but negated - should skip",
 			input: map[string]interface{}{"foo": "bar"},
-			instr: model.Instruction{
+			instr: Instruction{
 				Op: "if",
 				Condition: map[string]interface{}{
 					"exists": "foo",
 				},
 				Not: true,
-				Then: []model.Instruction{
+				Then: []Instruction{
 					{
 						Op:    "set",
 						Key:   "ran",
@@ -188,13 +187,13 @@ func TestIfOperator_Apply(t *testing.T) {
 		{
 			name:  "condition does not match but negated - should run",
 			input: map[string]interface{}{"baz": "qux"},
-			instr: model.Instruction{
+			instr: Instruction{
 				Op: "if",
 				Condition: map[string]interface{}{
 					"exists": "foo",
 				},
 				Not: true,
-				Then: []model.Instruction{
+				Then: []Instruction{
 					{
 						Op:    "set",
 						Key:   "ran",
