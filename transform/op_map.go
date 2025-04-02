@@ -2,12 +2,11 @@ package transform
 
 import (
 	"fmt"
-	"github.com/tommed/ducto-dsl/model"
 )
 
 type MapOperator struct{}
 
-func (o *MapOperator) Validate(instr model.Instruction) error {
+func (o *MapOperator) Validate(instr Instruction) error {
 	if instr.Key == "" {
 		return fmt.Errorf("map operator requires 'key' field")
 	}
@@ -22,7 +21,7 @@ func (o *MapOperator) Name() string {
 	return "map"
 }
 
-func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error {
+func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) error {
 	arrVal, ok := input[instr.Key]
 	if !ok {
 		return fmt.Errorf("map operator: key %q not found in input", instr.Key)

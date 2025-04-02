@@ -3,7 +3,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tommed/ducto-dsl/model"
 	"github.com/tommed/ducto-dsl/transform"
 	"os"
 )
@@ -24,7 +23,7 @@ func LintCommand(args []string) int {
 	}
 
 	// Parse JSON
-	var prog model.Program
+	var prog transform.Program
 	if err := json.Unmarshal(data, &prog); err != nil {
 		fmt.Fprintf(os.Stderr, "invalid JSON: %v\n", err)
 		return 1

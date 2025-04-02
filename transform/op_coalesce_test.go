@@ -2,7 +2,6 @@ package transform
 
 import (
 	"context"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,22 +13,22 @@ func TestCoalesceOperator_Validate(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		instr   model.Instruction
+		instr   Instruction
 		wantErr bool
 	}{
 		{
 			name:    "missing key",
-			instr:   model.Instruction{Op: "coalesce", Value: "default"},
+			instr:   Instruction{Op: "coalesce", Value: "default"},
 			wantErr: true,
 		},
 		{
 			name:    "missing value",
-			instr:   model.Instruction{Op: "coalesce", Key: "foo"},
+			instr:   Instruction{Op: "coalesce", Key: "foo"},
 			wantErr: true,
 		},
 		{
 			name:    "valid coalesce",
-			instr:   model.Instruction{Op: "coalesce", Key: "foo", Value: "default"},
+			instr:   Instruction{Op: "coalesce", Key: "foo", Value: "default"},
 			wantErr: false,
 		},
 	}
@@ -52,19 +51,19 @@ func TestCoalesceOperator_Apply(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    map[string]interface{}
-		instr    model.Instruction
+		instr    Instruction
 		expected map[string]interface{}
 	}{
 		{
 			name:     "value missing - default applied",
 			input:    map[string]interface{}{},
-			instr:    model.Instruction{Op: "coalesce", Key: "foo", Value: "bar"},
+			instr:    Instruction{Op: "coalesce", Key: "foo", Value: "bar"},
 			expected: map[string]interface{}{"foo": "bar"},
 		},
 		{
 			name:     "value exists - default ignored",
 			input:    map[string]interface{}{"foo": "baz"},
-			instr:    model.Instruction{Op: "coalesce", Key: "foo", Value: "bar"},
+			instr:    Instruction{Op: "coalesce", Key: "foo", Value: "bar"},
 			expected: map[string]interface{}{"foo": "baz"},
 		},
 	}

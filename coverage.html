@@ -131,7 +131,6 @@ func main() <span class="cov0" title="0">{
 import (
         "encoding/json"
         "fmt"
-        "github.com/tommed/ducto-dsl/model"
         "github.com/tommed/ducto-dsl/transform"
         "os"
 )
@@ -152,7 +151,7 @@ func LintCommand(args []string) int <span class="cov10" title="5">{
         }</span>
 
         // Parse JSON
-        <span class="cov7" title="3">var prog model.Program
+        <span class="cov7" title="3">var prog transform.Program
         if err := json.Unmarshal(data, &amp;prog); err != nil </span><span class="cov1" title="1">{
                 fmt.Fprintf(os.Stderr, "invalid JSON: %v\n", err)
                 return 1
@@ -405,17 +404,16 @@ func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov5" titl
 import (
         "encoding/json"
         "fmt"
-        "github.com/tommed/ducto-dsl/model"
         "os"
 )
 
 // LoadProgram loads and parses a DSL program from disk.
-func LoadProgram(path string) (*model.Program, error) <span class="cov10" title="3">{
+func LoadProgram(path string) (*Program, error) <span class="cov10" title="3">{
         data, err := os.ReadFile(path)
         if err != nil </span><span class="cov1" title="1">{
                 return nil, fmt.Errorf("failed to read program: %w", err)
         }</span>
-        <span class="cov6" title="2">var prog model.Program
+        <span class="cov6" title="2">var prog Program
         if err := json.Unmarshal(data, &amp;prog); err != nil </span><span class="cov1" title="1">{
                 return nil, fmt.Errorf("failed to parse program: %w", err)
         }</span>
@@ -425,14 +423,10 @@ func LoadProgram(path string) (*model.Program, error) <span class="cov10" title=
 		
 		<pre class="file" id="file7" style="display: none">package transform
 
-import (
-        "github.com/tommed/ducto-dsl/model"
-)
-
 // NoOperation is our nil implementation, it literally does nothing and never fails
 type NoOperation struct{}
 
-func (n NoOperation) Validate(instr model.Instruction) error <span class="cov1" title="1">{
+func (n NoOperation) Validate(instr Instruction) error <span class="cov1" title="1">{
         return nil
 }</span>
 
@@ -440,7 +434,7 @@ func (n NoOperation) Name() string <span class="cov10" title="18">{
         return "noop"
 }</span>
 
-func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, _ model.Instruction) error <span class="cov1" title="1">{
+func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, _ Instruction) error <span class="cov1" title="1">{
         return nil
 }</span>
 </pre>
@@ -449,14 +443,13 @@ func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interf
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type CoalesceOperator struct{}
 
 func (o *CoalesceOperator) Name() string <span class="cov10" title="14">{ return "coalesce" }</span>
 
-func (o *CoalesceOperator) Validate(instr model.Instruction) error <span class="cov6" title="5">{
+func (o *CoalesceOperator) Validate(instr Instruction) error <span class="cov6" title="5">{
         if instr.Key == "" </span><span class="cov1" title="1">{
                 return errors.New("coalesce operator requires a key")
         }</span>
@@ -466,7 +459,7 @@ func (o *CoalesceOperator) Validate(instr model.Instruction) error <span class="
         <span class="cov4" title="3">return nil</span>
 }
 
-func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov3" title="2">{
+func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov3" title="2">{
         if _, ok := input[instr.Key]; !ok </span><span class="cov1" title="1">{
                 input[instr.Key] = instr.Value
         }</span>
@@ -478,12 +471,11 @@ func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[str
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type CopyOperator struct{}
 
-func (c *CopyOperator) Validate(instr model.Instruction) error <span class="cov4" title="3">{
+func (c *CopyOperator) Validate(instr Instruction) error <span class="cov4" title="3">{
         if instr.From == "" </span><span class="cov1" title="1">{
                 return errors.New("copy op missing or invalid from")
         }</span>
@@ -495,7 +487,7 @@ func (c *CopyOperator) Validate(instr model.Instruction) error <span class="cov4
 
 func (c *CopyOperator) Name() string <span class="cov10" title="18">{ return "copy" }</span>
 
-func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov1" title="1">{
+func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov1" title="1">{
         input[instr.To] = input[instr.From]
         return nil
 }</span>
@@ -505,12 +497,11 @@ func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type DeleteOperator struct{}
 
-func (d *DeleteOperator) Validate(instr model.Instruction) error <span class="cov3" title="2">{
+func (d *DeleteOperator) Validate(instr Instruction) error <span class="cov3" title="2">{
         if instr.Key == "" </span><span class="cov1" title="1">{
                 return errors.New("delete operator missing 'key'")
         }</span>
@@ -519,7 +510,7 @@ func (d *DeleteOperator) Validate(instr model.Instruction) error <span class="co
 
 func (d *DeleteOperator) Name() string <span class="cov10" title="17">{ return "delete" }</span>
 
-func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov1" title="1">{
+func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov1" title="1">{
         delete(input, instr.Key)
         return nil
 }</span>
@@ -529,13 +520,12 @@ func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[strin
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type FailOperator struct {
 }
 
-func (f FailOperator) Validate(instr model.Instruction) error <span class="cov4" title="3">{
+func (f FailOperator) Validate(instr Instruction) error <span class="cov4" title="3">{
         return nil
 }</span>
 
@@ -543,7 +533,7 @@ func (f FailOperator) Name() string <span class="cov10" title="22">{
         return "fail"
 }</span>
 
-func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, instr model.Instruction) error <span class="cov5" title="4">{
+func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, instr Instruction) error <span class="cov5" title="4">{
         return errors.New(instr.Value.(string))
 }</span>
 </pre>
@@ -552,14 +542,13 @@ func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]inter
 
 import (
         "errors"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type IfOperator struct{}
 
 func (o *IfOperator) Name() string <span class="cov10" title="14">{ return "if" }</span>
 
-func (o *IfOperator) Validate(instr model.Instruction) error <span class="cov9" title="11">{
+func (o *IfOperator) Validate(instr Instruction) error <span class="cov9" title="11">{
         if instr.Condition == nil </span><span class="cov1" title="1">{
                 return errors.New("if operator missing 'condition'")
         }</span>
@@ -572,7 +561,7 @@ func (o *IfOperator) Validate(instr model.Instruction) error <span class="cov9" 
         <span class="cov7" title="6">return nil</span>
 }
 
-func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov6" title="5">{
+func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) error <span class="cov6" title="5">{
         conditionResult := evaluateCondition(input, instr.Condition)
         if instr.Not </span><span class="cov3" title="2">{
                 conditionResult = !conditionResult
@@ -593,12 +582,11 @@ func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[strin
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type MapOperator struct{}
 
-func (o *MapOperator) Validate(instr model.Instruction) error <span class="cov7" title="10">{
+func (o *MapOperator) Validate(instr Instruction) error <span class="cov7" title="10">{
         if instr.Key == "" </span><span class="cov1" title="1">{
                 return fmt.Errorf("map operator requires 'key' field")
         }</span>
@@ -613,7 +601,7 @@ func (o *MapOperator) Name() string <span class="cov10" title="25">{
         return "map"
 }</span>
 
-func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov6" title="8">{
+func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) error <span class="cov6" title="8">{
         arrVal, ok := input[instr.Key]
         if !ok </span><span class="cov2" title="2">{
                 return fmt.Errorf("map operator: key %q not found in input", instr.Key)
@@ -645,7 +633,6 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type MergeOperator struct{}
@@ -654,7 +641,7 @@ func (o *MergeOperator) Name() string <span class="cov10" title="21">{
         return "merge"
 }</span>
 
-func (o *MergeOperator) Validate(instr model.Instruction) error <span class="cov6" title="6">{
+func (o *MergeOperator) Validate(instr Instruction) error <span class="cov6" title="6">{
         if instr.Value == nil </span><span class="cov1" title="1">{
                 return fmt.Errorf("merge operator missing 'value'")
         }</span>
@@ -664,7 +651,7 @@ func (o *MergeOperator) Validate(instr model.Instruction) error <span class="cov
         <span class="cov5" title="4">return nil</span>
 }
 
-func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov5" title="4">{
+func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov5" title="4">{
         for k, v := range instr.Value.(map[string]interface{}) </span><span class="cov5" title="5">{
                 // If `if_not_set` is true, only set if missing
                 if instr.IfNotSet </span><span class="cov4" title="3">{
@@ -683,21 +670,20 @@ func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type SetOperator struct{}
 
 func (s *SetOperator) Name() string <span class="cov10" title="28">{ return "set" }</span>
 
-func (s *SetOperator) Validate(instr model.Instruction) error <span class="cov7" title="10">{
+func (s *SetOperator) Validate(instr Instruction) error <span class="cov7" title="10">{
         if instr.Key == "" </span><span class="cov5" title="6">{
                 return fmt.Errorf("set operator missing 'key'")
         }</span>
         <span class="cov4" title="4">return nil</span>
 }
 
-func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr model.Instruction) error <span class="cov6" title="7">{
+func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov6" title="7">{
         input[instr.Key] = instr.Value
         return nil
 }</span>
@@ -707,7 +693,6 @@ func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]i
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 type Registry struct {
@@ -746,7 +731,7 @@ func (r *Registry) Register(op Operator) <span class="cov10" title="172">{
         <span class="cov9" title="170">r.ops[name] = op</span>
 }
 
-func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr model.Instruction) bool <span class="cov4" title="8">{
+func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) bool <span class="cov4" title="8">{
         op := r.ops[instr.Op]
         if err := op.Apply(ctx, reg, input, instr); err != nil </span><span class="cov3" title="4">{
                 return ctx.HandleError(err)
@@ -765,7 +750,6 @@ func (r *Registry) Find(op string) Operator <span class="cov6" title="21">{
 import (
         "context"
         "errors"
-        "github.com/tommed/ducto-dsl/model"
 )
 
 // Transformer applies DSL-defined transformations
@@ -780,7 +764,7 @@ func New() *Transformer <span class="cov10" title="8">{
 }</span>
 
 // Apply applies the given transformation definition
-func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *model.Program) (map[string]interface{}, error) <span class="cov10" title="8">{
+func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) <span class="cov10" title="8">{
 
         // Validate program before execution
         if err := ValidateProgram(t.reg, prog); err != nil </span><span class="cov7" title="4">{
@@ -827,10 +811,9 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 
 import (
         "fmt"
-        "github.com/tommed/ducto-dsl/model"
 )
 
-func ValidateProgram(r *Registry, prog *model.Program) error <span class="cov10" title="17">{
+func ValidateProgram(r *Registry, prog *Program) error <span class="cov10" title="17">{
         if prog == nil </span><span class="cov1" title="1">{
                 return fmt.Errorf("program is nil")
         }</span>
@@ -850,7 +833,7 @@ func ValidateProgram(r *Registry, prog *model.Program) error <span class="cov10"
 
                 // Validate nested instructions (e.g., map, if)
                 <span class="cov7" title="8">if len(instr.Then) &gt; 0 </span><span class="cov1" title="1">{
-                        subProg := &amp;model.Program{
+                        subProg := &amp;Program{
                                 Version:      prog.Version,
                                 Instructions: instr.Then,
                         }

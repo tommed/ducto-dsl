@@ -5,13 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 )
 
 func TestMapOperator_Apply(t *testing.T) {
 	type args struct {
-		instr model.Instruction
+		instr Instruction
 	}
 	tests := []struct {
 		name         string
@@ -22,7 +21,7 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "no key",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:  "map",
 					Key: "",
 				},
@@ -32,10 +31,10 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "no then",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "a",
-					Then: []model.Instruction{},
+					Then: []Instruction{},
 				},
 			},
 			wantErr: errors.New("map operator requires at least one instruction in 'then'"),
@@ -43,10 +42,10 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "key not found",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "d",
-					Then: []model.Instruction{{Op: "set", Key: "e", Value: "e"}},
+					Then: []Instruction{{Op: "set", Key: "e", Value: "e"}},
 				},
 			},
 			wantErr: errors.New("map operator: key \"d\" not found in input"),
@@ -54,10 +53,10 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "key not array",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "b",
-					Then: []model.Instruction{{Op: "set", Key: "e", Value: "e"}},
+					Then: []Instruction{{Op: "set", Key: "e", Value: "e"}},
 				},
 			},
 			wantErr: errors.New("map operator: input[\"b\"] is not an array"),
@@ -65,10 +64,10 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "key not object",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "f",
-					Then: []model.Instruction{{Op: "set", Key: "e", Value: "e"}},
+					Then: []Instruction{{Op: "set", Key: "e", Value: "e"}},
 				},
 			},
 			wantErr: errors.New("map operator: input[\"f\"] is not an array"),
@@ -76,10 +75,10 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "key not object",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "f",
-					Then: []model.Instruction{{Op: "fail", Value: "fail_on_purpose"}},
+					Then: []Instruction{{Op: "fail", Value: "fail_on_purpose"}},
 				},
 			},
 			wantErr: errors.New("map operator: input[\"f\"] is not an array"),
@@ -87,10 +86,10 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "sub failure",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "a",
-					Then: []model.Instruction{{Op: "fail", Value: "fail_on_purpose"}},
+					Then: []Instruction{{Op: "fail", Value: "fail_on_purpose"}},
 				},
 			},
 			wantErr: errors.New("map operator: sub-instruction failed at index 0"),
@@ -98,10 +97,10 @@ func TestMapOperator_Apply(t *testing.T) {
 		{
 			name: "wrong array type",
 			args: args{
-				instr: model.Instruction{
+				instr: Instruction{
 					Op:   "map",
 					Key:  "g",
-					Then: []model.Instruction{{Op: "noop"}},
+					Then: []Instruction{{Op: "noop"}},
 				},
 			},
 			wantErr: errors.New("map operator: array item at index 0 is not an object"),

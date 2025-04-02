@@ -2,7 +2,6 @@ package transform
 
 import (
 	"context"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +13,7 @@ func TestOperators(t *testing.T) {
 		op             Operator
 		otherOpsNeeded []Operator
 		input          map[string]interface{}
-		instr          model.Instruction
+		instr          Instruction
 		expect         map[string]interface{}
 		expectedName   string
 		wantErr        bool
@@ -23,7 +22,7 @@ func TestOperators(t *testing.T) {
 			name:         "set_basic",
 			op:           &SetOperator{},
 			input:        map[string]interface{}{},
-			instr:        model.Instruction{Key: "foo", Value: "bar"},
+			instr:        Instruction{Key: "foo", Value: "bar"},
 			expectedName: "set",
 			expect:       map[string]interface{}{"foo": "bar"},
 		},
@@ -31,7 +30,7 @@ func TestOperators(t *testing.T) {
 			name:         "delete_basic",
 			op:           &DeleteOperator{},
 			input:        map[string]interface{}{"foo": "bar"},
-			instr:        model.Instruction{Key: "foo"},
+			instr:        Instruction{Key: "foo"},
 			expectedName: "delete",
 			expect:       map[string]interface{}{},
 		},
@@ -39,7 +38,7 @@ func TestOperators(t *testing.T) {
 			name:         "copy_basic",
 			op:           &CopyOperator{},
 			input:        map[string]interface{}{"a": 123},
-			instr:        model.Instruction{From: "a", To: "b"},
+			instr:        Instruction{From: "a", To: "b"},
 			expectedName: "copy",
 			expect:       map[string]interface{}{"a": 123, "b": 123},
 		},
@@ -47,7 +46,7 @@ func TestOperators(t *testing.T) {
 			name:         "noop",
 			op:           &NoOperation{},
 			input:        map[string]interface{}{"a": 123},
-			instr:        model.Instruction{},
+			instr:        Instruction{},
 			expectedName: "noop",
 			expect:       map[string]interface{}{"a": 123},
 		},
@@ -63,10 +62,10 @@ func TestOperators(t *testing.T) {
 					"bar": 1,
 				},
 			}},
-			instr: model.Instruction{
+			instr: Instruction{
 				Op:  "map",
 				Key: "a",
-				Then: []model.Instruction{
+				Then: []Instruction{
 					{
 						Op:    "set",
 						Key:   "status",
@@ -123,31 +122,31 @@ func TestOperators_ValidationErrors(t *testing.T) {
 	cases := []struct {
 		name        string
 		op          Operator
-		instruction model.Instruction
+		instruction Instruction
 		wantErr     string
 	}{
 		{
 			name:        "set_no_key",
 			op:          &SetOperator{},
-			instruction: model.Instruction{},
+			instruction: Instruction{},
 			wantErr:     "operator missing 'key'",
 		},
 		{
 			name:        "delete_no_key",
 			op:          &DeleteOperator{},
-			instruction: model.Instruction{},
+			instruction: Instruction{},
 			wantErr:     "operator missing 'key'",
 		},
 		{
 			name:        "copy_no_from",
 			op:          &CopyOperator{},
-			instruction: model.Instruction{},
+			instruction: Instruction{},
 			wantErr:     "op missing or invalid from",
 		},
 		{
 			name:        "copy_no_to",
 			op:          &CopyOperator{},
-			instruction: model.Instruction{From: "a"},
+			instruction: Instruction{From: "a"},
 			wantErr:     "op missing or invalid to",
 		},
 	}

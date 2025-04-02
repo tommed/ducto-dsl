@@ -2,17 +2,16 @@ package transform
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/tommed/ducto-dsl/model"
 	"testing"
 )
 
 func TestValidateProgram_BadInstruction(t *testing.T) {
 	r := NewRegistry()
 	r.Register(&SetOperator{})
-	err := ValidateProgram(r, &model.Program{
+	err := ValidateProgram(r, &Program{
 		Version: 1,
 		OnError: "fail",
-		Instructions: []model.Instruction{
+		Instructions: []Instruction{
 			{
 				Op: "set",
 			},
@@ -25,14 +24,14 @@ func TestValidateProgram_BadSubInstruction(t *testing.T) {
 	r := NewRegistry()
 	r.Register(&SetOperator{})
 	r.Register(&MapOperator{})
-	err := ValidateProgram(r, &model.Program{
+	err := ValidateProgram(r, &Program{
 		Version: 1,
 		OnError: "fail",
-		Instructions: []model.Instruction{
+		Instructions: []Instruction{
 			{
 				Op:  "map",
 				Key: "a",
-				Then: []model.Instruction{
+				Then: []Instruction{
 					{
 						Op: "set",
 					},

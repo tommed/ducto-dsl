@@ -3,7 +3,6 @@ package transform
 import (
 	"context"
 	"errors"
-	"github.com/tommed/ducto-dsl/model"
 )
 
 // Transformer applies DSL-defined transformations
@@ -18,7 +17,7 @@ func New() *Transformer {
 }
 
 // Apply applies the given transformation definition
-func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *model.Program) (map[string]interface{}, error) {
+func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) {
 
 	// Validate program before execution
 	if err := ValidateProgram(t.reg, prog); err != nil {
