@@ -16,6 +16,6 @@ func (d *DeleteOperator) Validate(instr Instruction) error {
 func (d *DeleteOperator) Name() string { return "delete" }
 
 func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error {
-	delete(input, instr.Key)
+	DeleteValueAtPath(input, instr.Key)
 	return nil
 }

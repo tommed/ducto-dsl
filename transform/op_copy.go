@@ -19,6 +19,6 @@ func (c *CopyOperator) Validate(instr Instruction) error {
 func (c *CopyOperator) Name() string { return "copy" }
 
 func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error {
-	input[instr.To] = input[instr.From]
-	return nil
+	val, _ := GetValueAtPath(input, instr.From)
+	return SetValueAtPath(input, instr.To, val)
 }

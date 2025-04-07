@@ -22,12 +22,16 @@ func (o *MergeOperator) Validate(instr Instruction) error {
 
 func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error {
 	for k, v := range instr.Value.(map[string]interface{}) {
+
 		// If `if_not_set` is true, only set if missing
 		if instr.IfNotSet {
-			if _, exists := input[k]; exists {
+			_, exists := GetValueAtPath(input, k)
+			if exists {
 				continue
 			}
 		}
+
+		// Set value (don't need a path here as it's always the root object)
 		input[k] = v
 	}
 

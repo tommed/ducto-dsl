@@ -1,3 +1,4 @@
+// File: ducto-dsl/transform/op_if.go
 package transform
 
 import (
@@ -5,11 +6,6 @@ import (
 	"errors"
 	"fmt"
 )
-
-// NOTE: when adding new conditions, make sure you update the following:
-//   - docs/spec-vX.md    (make sure it's documented first!)
-//   - validateConditions (switch for valid key list)
-//   - evaluateCondition  (implement your new condition)
 
 // validateConditions ensures the conditions map uses valid clauses
 func validateConditions(condition map[string]interface{}) error {
@@ -27,7 +23,7 @@ func validateConditions(condition map[string]interface{}) error {
 			return fmt.Errorf("unknown condition %q", key)
 		}
 	}
-	return nil // impossible to reach technically
+	return nil
 }
 
 // evaluateCondition evaluates the conditions
@@ -51,7 +47,7 @@ func conditionExists(input map[string]interface{}, condition map[string]interfac
 	if !ok {
 		return false
 	}
-	_, exists := input[key]
+	_, exists := GetValueAtPath(input, key)
 	return exists
 }
 
@@ -66,12 +62,11 @@ func conditionEquals(input map[string]interface{}, condition map[string]interfac
 	}
 	expected := data["value"]
 
-	actual, exists := input[key]
+	actual, exists := GetValueAtPath(input, key)
 	if !exists {
 		return false
 	}
 
-	// Optional: deep equality
 	return jsonEqual(actual, expected)
 }
 

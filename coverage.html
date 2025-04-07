@@ -71,7 +71,7 @@
 				
 				<option value="file7">github.com/tommed/ducto-dsl/transform/noop.go (100.0%)</option>
 				
-				<option value="file8">github.com/tommed/ducto-dsl/transform/op_coalesce.go (100.0%)</option>
+				<option value="file8">github.com/tommed/ducto-dsl/transform/op_coalesce.go (90.9%)</option>
 				
 				<option value="file9">github.com/tommed/ducto-dsl/transform/op_copy.go (100.0%)</option>
 				
@@ -87,11 +87,13 @@
 				
 				<option value="file15">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
 				
-				<option value="file16">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
+				<option value="file16">github.com/tommed/ducto-dsl/transform/path.go (65.0%)</option>
 				
-				<option value="file17">github.com/tommed/ducto-dsl/transform/transformer.go (100.0%)</option>
+				<option value="file17">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
 				
-				<option value="file18">github.com/tommed/ducto-dsl/transform/validate.go (100.0%)</option>
+				<option value="file18">github.com/tommed/ducto-dsl/transform/transformer.go (100.0%)</option>
+				
+				<option value="file19">github.com/tommed/ducto-dsl/transform/validate.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -232,18 +234,14 @@ func TransformCommand(args []string, stdin io.Reader, stdout io.Writer, stderr i
 }
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package transform
+		<pre class="file" id="file4" style="display: none">// File: ducto-dsl/transform/op_if.go
+package transform
 
 import (
         "encoding/json"
         "errors"
         "fmt"
 )
-
-// NOTE: when adding new conditions, make sure you update the following:
-//   - docs/spec-vX.md    (make sure it's documented first!)
-//   - validateConditions (switch for valid key list)
-//   - evaluateCondition  (implement your new condition)
 
 // validateConditions ensures the conditions map uses valid clauses
 func validateConditions(condition map[string]interface{}) error <span class="cov6" title="9">{
@@ -261,7 +259,7 @@ func validateConditions(condition map[string]interface{}) error <span class="cov
                         return fmt.Errorf("unknown condition %q", key)</span>
                 }
         }
-        <span class="cov5" title="6">return nil</span> // impossible to reach technically
+        <span class="cov5" title="6">return nil</span>
 }
 
 // evaluateCondition evaluates the conditions
@@ -285,7 +283,7 @@ func conditionExists(input map[string]interface{}, condition map[string]interfac
         if !ok </span><span class="cov1" title="1">{
                 return false
         }</span>
-        <span class="cov7" title="11">_, exists := input[key]
+        <span class="cov7" title="11">_, exists := GetValueAtPath(input, key)
         return exists</span>
 }
 
@@ -300,12 +298,11 @@ func conditionEquals(input map[string]interface{}, condition map[string]interfac
         }</span>
         <span class="cov6" title="7">expected := data["value"]
 
-        actual, exists := input[key]
+        actual, exists := GetValueAtPath(input, key)
         if !exists </span><span class="cov2" title="2">{
                 return false
         }</span>
 
-        // Optional: deep equality
         <span class="cov5" title="5">return jsonEqual(actual, expected)</span>
 }
 
@@ -368,12 +365,12 @@ type ExecutionContext struct {
         // Future: you could add TraceID, Logger, Metrics, etc.
 }
 
-func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="44">{
+func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="52">{
         if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "capture" </span><span class="cov4" title="4">{
                 onError = "ignore"
         }</span>
 
-        <span class="cov10" title="44">return &amp;ExecutionContext{
+        <span class="cov10" title="52">return &amp;ExecutionContext{
                 Ctx:     ctx,
                 OnError: onError,
                 Errors:  []string{},
@@ -443,27 +440,55 @@ func (n NoOperation) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interf
 
 import (
         "errors"
+        "reflect"
 )
 
 type CoalesceOperator struct{}
 
 func (o *CoalesceOperator) Name() string <span class="cov10" title="14">{ return "coalesce" }</span>
 
-func (o *CoalesceOperator) Validate(instr Instruction) error <span class="cov6" title="5">{
+func (o *CoalesceOperator) Validate(instr Instruction) error <span class="cov8" title="10">{
         if instr.Key == "" </span><span class="cov1" title="1">{
                 return errors.New("coalesce operator requires a key")
         }</span>
-        <span class="cov5" title="4">if instr.Value == nil </span><span class="cov1" title="1">{
+        <span class="cov8" title="9">if instr.Value == nil </span><span class="cov1" title="1">{
                 return errors.New("coalesce operator requires a default value")
         }</span>
-        <span class="cov4" title="3">return nil</span>
+        <span class="cov8" title="8">return nil</span>
 }
 
-func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov3" title="2">{
-        if _, ok := input[instr.Key]; !ok </span><span class="cov1" title="1">{
-                input[instr.Key] = instr.Value
+func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov7" title="7">{
+        val, exists := GetValueAtPath(input, instr.Key)
+        if !exists || isZero(val) </span><span class="cov6" title="5">{
+                return SetValueAtPath(input, instr.Key, instr.Value)
         }</span>
         <span class="cov3" title="2">return nil</span>
+}
+
+// isZero returns true for nil, empty strings, zero numbers, empty slices/maps
+func isZero(v interface{}) bool <span class="cov9" title="13">{
+        if v == nil </span><span class="cov1" title="1">{
+                return true
+        }</span>
+        <span class="cov9" title="12">switch val := v.(type) </span>{
+        case string:<span class="cov5" title="4">
+                return val == ""</span>
+        case float64:<span class="cov1" title="1">
+                return val == 0</span>
+        case int, int32, int64:<span class="cov3" title="2">
+                return reflect.ValueOf(v).Int() == 0</span>
+        case uint, uint32, uint64:<span class="cov1" title="1">
+                return reflect.ValueOf(v).Uint() == 0</span>
+        case bool:<span class="cov3" title="2">
+                return false</span> // don't treat false as "empty"
+        case []interface{}:<span class="cov1" title="1">
+                return len(val) == 0</span>
+        case map[string]interface{}:<span class="cov1" title="1">
+                return len(val) == 0</span>
+        default:<span class="cov0" title="0">
+                rv := reflect.ValueOf(v)
+                return rv.Kind() == reflect.Ptr &amp;&amp; rv.IsNil()</span>
+        }
 }
 </pre>
 		
@@ -488,8 +513,8 @@ func (c *CopyOperator) Validate(instr Instruction) error <span class="cov4" titl
 func (c *CopyOperator) Name() string <span class="cov10" title="18">{ return "copy" }</span>
 
 func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov1" title="1">{
-        input[instr.To] = input[instr.From]
-        return nil
+        val, _ := GetValueAtPath(input, instr.From)
+        return SetValueAtPath(input, instr.To, val)
 }</span>
 </pre>
 		
@@ -501,17 +526,17 @@ import (
 
 type DeleteOperator struct{}
 
-func (d *DeleteOperator) Validate(instr Instruction) error <span class="cov3" title="2">{
+func (d *DeleteOperator) Validate(instr Instruction) error <span class="cov5" title="5">{
         if instr.Key == "" </span><span class="cov1" title="1">{
                 return errors.New("delete operator missing 'key'")
         }</span>
-        <span class="cov1" title="1">return nil</span>
+        <span class="cov4" title="4">return nil</span>
 }
 
-func (d *DeleteOperator) Name() string <span class="cov10" title="17">{ return "delete" }</span>
+func (d *DeleteOperator) Name() string <span class="cov10" title="23">{ return "delete" }</span>
 
-func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov1" title="1">{
-        delete(input, instr.Key)
+func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov4" title="4">{
+        DeleteValueAtPath(input, instr.Key)
         return nil
 }</span>
 </pre>
@@ -602,12 +627,12 @@ func (o *MapOperator) Name() string <span class="cov10" title="25">{
 }</span>
 
 func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) error <span class="cov6" title="8">{
-        arrVal, ok := input[instr.Key]
+        arrRaw, ok := GetValueAtPath(input, instr.Key)
         if !ok </span><span class="cov2" title="2">{
                 return fmt.Errorf("map operator: key %q not found in input", instr.Key)
         }</span>
 
-        <span class="cov6" title="6">arr, ok := arrVal.([]interface{})
+        <span class="cov6" title="6">arr, ok := arrRaw.([]interface{})
         if !ok </span><span class="cov4" title="3">{
                 return fmt.Errorf("map operator: input[%q] is not an array", instr.Key)
         }</span>
@@ -653,12 +678,16 @@ func (o *MergeOperator) Validate(instr Instruction) error <span class="cov6" tit
 
 func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov5" title="4">{
         for k, v := range instr.Value.(map[string]interface{}) </span><span class="cov5" title="5">{
+
                 // If `if_not_set` is true, only set if missing
                 if instr.IfNotSet </span><span class="cov4" title="3">{
-                        if _, exists := input[k]; exists </span><span class="cov1" title="1">{
+                        _, exists := GetValueAtPath(input, k)
+                        if exists </span><span class="cov1" title="1">{
                                 continue</span>
                         }
                 }
+
+                // Set value (don't need a path here as it's always the root object)
                 <span class="cov5" title="4">input[k] = v</span>
         }
 
@@ -684,12 +713,89 @@ func (s *SetOperator) Validate(instr Instruction) error <span class="cov7" title
 }
 
 func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov6" title="7">{
-        input[instr.Key] = instr.Value
-        return nil
+        return SetValueAtPath(input, instr.Key, instr.Value)
 }</span>
 </pre>
 		
 		<pre class="file" id="file16" style="display: none">package transform
+
+import (
+        "fmt"
+        "strings"
+)
+
+// GetValueAtPath retrieves a nested value using dot notation, e.g. "foo.bar.baz"
+func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) <span class="cov10" title="37">{
+        parts := strings.Split(path, ".")
+        var current interface{} = data
+
+        for _, part := range parts </span><span class="cov10" title="37">{
+                asMap, ok := current.(map[string]interface{})
+                if !ok </span><span class="cov0" title="0">{
+                        return nil, false
+                }</span>
+                <span class="cov10" title="37">current, ok = asMap[part]
+                if !ok </span><span class="cov6" title="11">{
+                        return nil, false
+                }</span>
+        }
+        <span class="cov9" title="26">return current, true</span>
+}
+
+// SetValueAtPath sets a value deeply within a map using dot notation
+func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov7" title="13">{
+        parts := strings.Split(path, ".")
+        if len(parts) == 0 </span><span class="cov0" title="0">{
+                return fmt.Errorf("invalid path: empty")
+        }</span>
+
+        <span class="cov7" title="13">current := data
+        for _, part := range parts[:len(parts)-1] </span><span class="cov0" title="0">{
+                next, exists := current[part]
+                if !exists </span><span class="cov0" title="0">{
+                        newMap := make(map[string]interface{})
+                        current[part] = newMap
+                        current = newMap
+                        continue</span>
+                }
+                <span class="cov0" title="0">asMap, ok := next.(map[string]interface{})
+                if !ok </span><span class="cov0" title="0">{
+                        return fmt.Errorf("cannot descend into non-map value at %q", part)
+                }</span>
+                <span class="cov0" title="0">current = asMap</span>
+        }
+        <span class="cov7" title="13">current[parts[len(parts)-1]] = value
+        return nil</span>
+}
+
+// File: ducto-dsl/transform/path.go
+
+// DeleteValueAtPath removes a key from a nested map structure via dot notation.
+// If the path or intermediate keys don't exist, it exits silently.
+func DeleteValueAtPath(data map[string]interface{}, path string) <span class="cov4" title="4">{
+        parts := strings.Split(path, ".")
+        if len(parts) == 0 </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov4" title="4">current := data
+
+        for _, part := range parts[:len(parts)-1] </span><span class="cov4" title="4">{
+                next, ok := current[part]
+                if !ok </span><span class="cov0" title="0">{
+                        return // path does not exist
+                }</span>
+                <span class="cov4" title="4">asMap, ok := next.(map[string]interface{})
+                if !ok </span><span class="cov1" title="1">{
+                        return // not a map — can't proceed
+                }</span>
+                <span class="cov3" title="3">current = asMap</span>
+        }
+
+        <span class="cov3" title="3">delete(current, parts[len(parts)-1])</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package transform
 
 import (
         "fmt"
@@ -716,19 +822,19 @@ func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov5" title
         <span class="cov5" title="14">return reg</span>
 }
 
-func NewRegistry() *Registry <span class="cov7" title="36">{
+func NewRegistry() *Registry <span class="cov7" title="39">{
         return &amp;Registry{ops: map[string]Operator{}}
 }</span>
 
-func (r *Registry) Register(op Operator) <span class="cov10" title="172">{
+func (r *Registry) Register(op Operator) <span class="cov10" title="175">{
         name := op.Name()
         if name == "" </span><span class="cov1" title="1">{
                 panic("operator has no name")</span>
         }
-        <span class="cov9" title="171">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
+        <span class="cov9" title="174">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
                 panic(fmt.Sprintf("operator with name '%s' is already registered", name))</span>
         }
-        <span class="cov9" title="170">r.ops[name] = op</span>
+        <span class="cov9" title="173">r.ops[name] = op</span>
 }
 
 func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) bool <span class="cov4" title="8">{
@@ -745,7 +851,7 @@ func (r *Registry) Find(op string) Operator <span class="cov6" title="21">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">package transform
+		<pre class="file" id="file18" style="display: none">package transform
 
 import (
         "context"
@@ -807,7 +913,7 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 }
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package transform
+		<pre class="file" id="file19" style="display: none">package transform
 
 import (
         "fmt"
