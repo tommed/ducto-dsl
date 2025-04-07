@@ -16,6 +16,5 @@ func (s *SetOperator) Validate(instr Instruction) error {
 }
 
 func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error {
-	input[instr.Key] = instr.Value
-	return nil
+	return SetValueAtPath(input, instr.Key, instr.Value)
 }

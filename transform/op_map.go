@@ -22,12 +22,12 @@ func (o *MapOperator) Name() string {
 }
 
 func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) error {
-	arrVal, ok := input[instr.Key]
+	arrRaw, ok := GetValueAtPath(input, instr.Key)
 	if !ok {
 		return fmt.Errorf("map operator: key %q not found in input", instr.Key)
 	}
 
-	arr, ok := arrVal.([]interface{})
+	arr, ok := arrRaw.([]interface{})
 	if !ok {
 		return fmt.Errorf("map operator: input[%q] is not an array", instr.Key)
 	}
