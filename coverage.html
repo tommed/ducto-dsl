@@ -83,11 +83,11 @@
 				
 				<option value="file13">github.com/tommed/ducto-dsl/transform/op_map.go (100.0%)</option>
 				
-				<option value="file14">github.com/tommed/ducto-dsl/transform/op_merge.go (100.0%)</option>
+				<option value="file14">github.com/tommed/ducto-dsl/transform/op_merge.go (93.8%)</option>
 				
 				<option value="file15">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
 				
-				<option value="file16">github.com/tommed/ducto-dsl/transform/path.go (65.0%)</option>
+				<option value="file16">github.com/tommed/ducto-dsl/transform/path.go (67.3%)</option>
 				
 				<option value="file17">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
 				
@@ -677,7 +677,11 @@ func (o *MergeOperator) Validate(instr Instruction) error <span class="cov6" tit
 }
 
 func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov5" title="4">{
-        for k, v := range instr.Value.(map[string]interface{}) </span><span class="cov5" title="5">{
+        inputAsMap, ok := CoerceToMap(instr.Value)
+        if !ok </span><span class="cov0" title="0">{
+                return fmt.Errorf("merge operator: value must be an object")
+        }</span>
+        <span class="cov5" title="4">for k, v := range inputAsMap </span><span class="cov5" title="5">{
 
                 // If `if_not_set` is true, only set if missing
                 if instr.IfNotSet </span><span class="cov4" title="3">{
@@ -721,77 +725,110 @@ func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]i
 
 import (
         "fmt"
+        "reflect"
         "strings"
 )
 
-// GetValueAtPath retrieves a nested value using dot notation, e.g. "foo.bar.baz"
-func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) <span class="cov10" title="37">{
-        parts := strings.Split(path, ".")
+// CoerceToMap attempts to cast or reflect a map[string]T into map[string]interface{}
+func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov10" title="62">{
+        switch m := v.(type) </span>{
+        case map[string]interface{}:<span class="cov9" title="61">
+                return m, true</span>
+        default:<span class="cov1" title="1">
+                rv := reflect.ValueOf(v)
+                if rv.Kind() != reflect.Map || rv.Type().Key().Kind() != reflect.String </span><span class="cov1" title="1">{
+                        return nil, false
+                }</span>
+
+                <span class="cov0" title="0">coerced := make(map[string]interface{}, rv.Len())
+                for _, key := range rv.MapKeys() </span><span class="cov0" title="0">{
+                        val := rv.MapIndex(key)
+                        coerced[key.String()] = val.Interface()
+                }</span>
+                <span class="cov0" title="0">return coerced, true</span>
+        }
+}
+
+func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) <span class="cov8" title="37">{
+        if path == "" </span><span class="cov0" title="0">{
+                return data, true
+        }</span>
+
+        <span class="cov8" title="37">parts := strings.Split(path, ".")
         var current interface{} = data
 
-        for _, part := range parts </span><span class="cov10" title="37">{
-                asMap, ok := current.(map[string]interface{})
+        for _, part := range parts </span><span class="cov8" title="37">{
+                m, ok := CoerceToMap(current)
                 if !ok </span><span class="cov0" title="0">{
                         return nil, false
                 }</span>
-                <span class="cov10" title="37">current, ok = asMap[part]
+                <span class="cov8" title="37">current, ok = m[part]
                 if !ok </span><span class="cov6" title="11">{
                         return nil, false
                 }</span>
         }
-        <span class="cov9" title="26">return current, true</span>
+
+        <span class="cov8" title="26">return current, true</span>
 }
 
-// SetValueAtPath sets a value deeply within a map using dot notation
-func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov7" title="13">{
-        parts := strings.Split(path, ".")
-        if len(parts) == 0 </span><span class="cov0" title="0">{
-                return fmt.Errorf("invalid path: empty")
+func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov6" title="13">{
+        if path == "" </span><span class="cov0" title="0">{
+                return fmt.Errorf("cannot set empty path")
         }</span>
 
-        <span class="cov7" title="13">current := data
-        for _, part := range parts[:len(parts)-1] </span><span class="cov0" title="0">{
-                next, exists := current[part]
-                if !exists </span><span class="cov0" title="0">{
-                        newMap := make(map[string]interface{})
-                        current[part] = newMap
-                        current = newMap
-                        continue</span>
-                }
-                <span class="cov0" title="0">asMap, ok := next.(map[string]interface{})
+        <span class="cov6" title="13">parts := strings.Split(path, ".")
+        var current interface{} = data
+
+        for i, part := range parts </span><span class="cov6" title="13">{
+                isLast := i == len(parts)-1
+
+                m, ok := CoerceToMap(current)
                 if !ok </span><span class="cov0" title="0">{
-                        return fmt.Errorf("cannot descend into non-map value at %q", part)
+                        return fmt.Errorf("path segment %q is not a map", part)
                 }</span>
-                <span class="cov0" title="0">current = asMap</span>
+
+                <span class="cov6" title="13">if isLast </span><span class="cov6" title="13">{
+                        m[part] = value
+                        return nil
+                }</span>
+
+                <span class="cov0" title="0">next, exists := m[part]
+                if !exists </span><span class="cov0" title="0">{
+                        next = map[string]interface{}{}
+                        m[part] = next
+                }</span>
+                <span class="cov0" title="0">current = next</span>
         }
-        <span class="cov7" title="13">current[parts[len(parts)-1]] = value
-        return nil</span>
+
+        <span class="cov0" title="0">return nil</span>
 }
 
-// File: ducto-dsl/transform/path.go
-
-// DeleteValueAtPath removes a key from a nested map structure via dot notation.
-// If the path or intermediate keys don't exist, it exits silently.
 func DeleteValueAtPath(data map[string]interface{}, path string) <span class="cov4" title="4">{
-        parts := strings.Split(path, ".")
+        if path == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov4" title="4">parts := strings.Split(path, ".")
         if len(parts) == 0 </span><span class="cov0" title="0">{
                 return
         }</span>
-        <span class="cov4" title="4">current := data
+
+        <span class="cov4" title="4">var current interface{} = data
 
         for _, part := range parts[:len(parts)-1] </span><span class="cov4" title="4">{
-                next, ok := current[part]
+                m, ok := CoerceToMap(current)
                 if !ok </span><span class="cov0" title="0">{
-                        return // path does not exist
+                        return
                 }</span>
-                <span class="cov4" title="4">asMap, ok := next.(map[string]interface{})
-                if !ok </span><span class="cov1" title="1">{
-                        return // not a map — can't proceed
-                }</span>
-                <span class="cov3" title="3">current = asMap</span>
+                <span class="cov4" title="4">current = m[part]</span>
         }
 
-        <span class="cov3" title="3">delete(current, parts[len(parts)-1])</span>
+        <span class="cov4" title="4">m, ok := CoerceToMap(current)
+        if !ok </span><span class="cov1" title="1">{
+                return
+        }</span>
+
+        <span class="cov3" title="3">delete(m, parts[len(parts)-1])</span>
 }
 </pre>
 		

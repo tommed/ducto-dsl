@@ -2,75 +2,108 @@ package transform
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
-// GetValueAtPath retrieves a nested value using dot notation, e.g. "foo.bar.baz"
+// CoerceToMap attempts to cast or reflect a map[string]T into map[string]interface{}
+func CoerceToMap(v interface{}) (map[string]interface{}, bool) {
+	switch m := v.(type) {
+	case map[string]interface{}:
+		return m, true
+	default:
+		rv := reflect.ValueOf(v)
+		if rv.Kind() != reflect.Map || rv.Type().Key().Kind() != reflect.String {
+			return nil, false
+		}
+
+		coerced := make(map[string]interface{}, rv.Len())
+		for _, key := range rv.MapKeys() {
+			val := rv.MapIndex(key)
+			coerced[key.String()] = val.Interface()
+		}
+		return coerced, true
+	}
+}
+
 func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) {
+	if path == "" {
+		return data, true
+	}
+
 	parts := strings.Split(path, ".")
 	var current interface{} = data
 
 	for _, part := range parts {
-		asMap, ok := current.(map[string]interface{})
+		m, ok := CoerceToMap(current)
 		if !ok {
 			return nil, false
 		}
-		current, ok = asMap[part]
+		current, ok = m[part]
 		if !ok {
 			return nil, false
 		}
 	}
+
 	return current, true
 }
 
-// SetValueAtPath sets a value deeply within a map using dot notation
 func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error {
-	parts := strings.Split(path, ".")
-	if len(parts) == 0 {
-		return fmt.Errorf("invalid path: empty")
+	if path == "" {
+		return fmt.Errorf("cannot set empty path")
 	}
 
-	current := data
-	for _, part := range parts[:len(parts)-1] {
-		next, exists := current[part]
-		if !exists {
-			newMap := make(map[string]interface{})
-			current[part] = newMap
-			current = newMap
-			continue
-		}
-		asMap, ok := next.(map[string]interface{})
+	parts := strings.Split(path, ".")
+	var current interface{} = data
+
+	for i, part := range parts {
+		isLast := i == len(parts)-1
+
+		m, ok := CoerceToMap(current)
 		if !ok {
-			return fmt.Errorf("cannot descend into non-map value at %q", part)
+			return fmt.Errorf("path segment %q is not a map", part)
 		}
-		current = asMap
+
+		if isLast {
+			m[part] = value
+			return nil
+		}
+
+		next, exists := m[part]
+		if !exists {
+			next = map[string]interface{}{}
+			m[part] = next
+		}
+		current = next
 	}
-	current[parts[len(parts)-1]] = value
+
 	return nil
 }
 
-// File: ducto-dsl/transform/path.go
-
-// DeleteValueAtPath removes a key from a nested map structure via dot notation.
-// If the path or intermediate keys don't exist, it exits silently.
 func DeleteValueAtPath(data map[string]interface{}, path string) {
+	if path == "" {
+		return
+	}
+
 	parts := strings.Split(path, ".")
 	if len(parts) == 0 {
 		return
 	}
-	current := data
+
+	var current interface{} = data
 
 	for _, part := range parts[:len(parts)-1] {
-		next, ok := current[part]
+		m, ok := CoerceToMap(current)
 		if !ok {
-			return // path does not exist
+			return
 		}
-		asMap, ok := next.(map[string]interface{})
-		if !ok {
-			return // not a map — can't proceed
-		}
-		current = asMap
+		current = m[part]
 	}
 
-	delete(current, parts[len(parts)-1])
+	m, ok := CoerceToMap(current)
+	if !ok {
+		return
+	}
+
+	delete(m, parts[len(parts)-1])
 }
