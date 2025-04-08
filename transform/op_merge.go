@@ -21,7 +21,11 @@ func (o *MergeOperator) Validate(instr Instruction) error {
 }
 
 func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error {
-	for k, v := range instr.Value.(map[string]interface{}) {
+	inputAsMap, ok := CoerceToMap(instr.Value)
+	if !ok {
+		return fmt.Errorf("merge operator: value must be an object")
+	}
+	for k, v := range inputAsMap {
 
 		// If `if_not_set` is true, only set if missing
 		if instr.IfNotSet {
