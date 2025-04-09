@@ -77,23 +77,25 @@
 				
 				<option value="file10">github.com/tommed/ducto-dsl/transform/op_delete.go (100.0%)</option>
 				
-				<option value="file11">github.com/tommed/ducto-dsl/transform/op_fail.go (100.0%)</option>
+				<option value="file11">github.com/tommed/ducto-dsl/transform/op_drop_if.go (75.0%)</option>
 				
-				<option value="file12">github.com/tommed/ducto-dsl/transform/op_if.go (100.0%)</option>
+				<option value="file12">github.com/tommed/ducto-dsl/transform/op_fail.go (100.0%)</option>
 				
-				<option value="file13">github.com/tommed/ducto-dsl/transform/op_map.go (100.0%)</option>
+				<option value="file13">github.com/tommed/ducto-dsl/transform/op_if.go (100.0%)</option>
 				
-				<option value="file14">github.com/tommed/ducto-dsl/transform/op_merge.go (93.8%)</option>
+				<option value="file14">github.com/tommed/ducto-dsl/transform/op_map.go (100.0%)</option>
 				
-				<option value="file15">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
+				<option value="file15">github.com/tommed/ducto-dsl/transform/op_merge.go (93.8%)</option>
 				
-				<option value="file16">github.com/tommed/ducto-dsl/transform/path.go (67.3%)</option>
+				<option value="file16">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
 				
-				<option value="file17">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
+				<option value="file17">github.com/tommed/ducto-dsl/transform/path.go (67.3%)</option>
 				
-				<option value="file18">github.com/tommed/ducto-dsl/transform/transformer.go (100.0%)</option>
+				<option value="file18">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
 				
-				<option value="file19">github.com/tommed/ducto-dsl/transform/validate.go (100.0%)</option>
+				<option value="file19">github.com/tommed/ducto-dsl/transform/transformer.go (100.0%)</option>
+				
+				<option value="file20">github.com/tommed/ducto-dsl/transform/validate.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -354,7 +356,8 @@ type contextKey string
 const ContextKeyDebug contextKey = "ducto-debug"
 
 type ExecutionContext struct {
-        Ctx context.Context
+        Ctx     context.Context
+        Dropped bool // Don't send to the output writer
 
         OnError string   // "ignore", "fail", "capture"
         Errors  []string // Collected if OnError = "capture"
@@ -365,12 +368,12 @@ type ExecutionContext struct {
         // Future: you could add TraceID, Logger, Metrics, etc.
 }
 
-func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="52">{
-        if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "capture" </span><span class="cov4" title="4">{
+func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext <span class="cov10" title="53">{
+        if onError != "ignore" &amp;&amp; onError != "fail" &amp;&amp; onError != "capture" </span><span class="cov4" title="5">{
                 onError = "ignore"
         }</span>
 
-        <span class="cov10" title="52">return &amp;ExecutionContext{
+        <span class="cov10" title="53">return &amp;ExecutionContext{
                 Ctx:     ctx,
                 OnError: onError,
                 Errors:  []string{},
@@ -379,7 +382,7 @@ func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext 
 
 func (ctx *ExecutionContext) HandleError(err error) bool <span class="cov5" title="8">{
         if err == nil </span><span class="cov1" title="1">{
-                return true // no-op
+                return true
         }</span>
 
         <span class="cov5" title="7">switch ctx.OnError </span>{
@@ -427,7 +430,7 @@ func (n NoOperation) Validate(instr Instruction) error <span class="cov1" title=
         return nil
 }</span>
 
-func (n NoOperation) Name() string <span class="cov10" title="18">{
+func (n NoOperation) Name() string <span class="cov10" title="19">{
         return "noop"
 }</span>
 
@@ -445,7 +448,7 @@ import (
 
 type CoalesceOperator struct{}
 
-func (o *CoalesceOperator) Name() string <span class="cov10" title="14">{ return "coalesce" }</span>
+func (o *CoalesceOperator) Name() string <span class="cov10" title="15">{ return "coalesce" }</span>
 
 func (o *CoalesceOperator) Validate(instr Instruction) error <span class="cov8" title="10">{
         if instr.Key == "" </span><span class="cov1" title="1">{
@@ -454,7 +457,7 @@ func (o *CoalesceOperator) Validate(instr Instruction) error <span class="cov8" 
         <span class="cov8" title="9">if instr.Value == nil </span><span class="cov1" title="1">{
                 return errors.New("coalesce operator requires a default value")
         }</span>
-        <span class="cov8" title="8">return nil</span>
+        <span class="cov7" title="8">return nil</span>
 }
 
 func (o *CoalesceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov7" title="7">{
@@ -510,7 +513,7 @@ func (c *CopyOperator) Validate(instr Instruction) error <span class="cov4" titl
         <span class="cov1" title="1">return nil</span>
 }
 
-func (c *CopyOperator) Name() string <span class="cov10" title="18">{ return "copy" }</span>
+func (c *CopyOperator) Name() string <span class="cov10" title="19">{ return "copy" }</span>
 
 func (c *CopyOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov1" title="1">{
         val, _ := GetValueAtPath(input, instr.From)
@@ -533,7 +536,7 @@ func (d *DeleteOperator) Validate(instr Instruction) error <span class="cov5" ti
         <span class="cov4" title="4">return nil</span>
 }
 
-func (d *DeleteOperator) Name() string <span class="cov10" title="23">{ return "delete" }</span>
+func (d *DeleteOperator) Name() string <span class="cov10" title="24">{ return "delete" }</span>
 
 func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov4" title="4">{
         DeleteValueAtPath(input, instr.Key)
@@ -542,6 +545,40 @@ func (d *DeleteOperator) Apply(_ *ExecutionContext, _ *Registry, input map[strin
 </pre>
 		
 		<pre class="file" id="file11" style="display: none">package transform
+
+import (
+        "fmt"
+)
+
+type DropIfOperator struct{}
+
+func (d *DropIfOperator) Name() string <span class="cov10" title="15">{ return "drop_if" }</span>
+
+func (d *DropIfOperator) Validate(instr Instruction) error <span class="cov1" title="1">{
+        if instr.Key == "" </span><span class="cov0" title="0">{
+                return fmt.Errorf("drop_if requires a 'key'")
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (d *DropIfOperator) Apply(ctx *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov1" title="1">{
+        val, ok := GetValueAtPath(input, instr.Key)
+
+        drop := ok &amp;&amp; val == true
+        if instr.Not </span><span class="cov0" title="0">{
+                drop = !drop
+        }</span>
+
+        <span class="cov1" title="1">if drop </span><span class="cov1" title="1">{
+                ctx.Dropped = true
+                return nil // I know... but this just looks more right to me!
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package transform
 
 import (
         "errors"
@@ -554,16 +591,16 @@ func (f FailOperator) Validate(instr Instruction) error <span class="cov4" title
         return nil
 }</span>
 
-func (f FailOperator) Name() string <span class="cov10" title="22">{
+func (f FailOperator) Name() string <span class="cov10" title="23">{
         return "fail"
 }</span>
 
-func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, instr Instruction) error <span class="cov5" title="4">{
+func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]interface{}, instr Instruction) error <span class="cov4" title="4">{
         return errors.New(instr.Value.(string))
 }</span>
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package transform
+		<pre class="file" id="file13" style="display: none">package transform
 
 import (
         "errors"
@@ -571,9 +608,9 @@ import (
 
 type IfOperator struct{}
 
-func (o *IfOperator) Name() string <span class="cov10" title="14">{ return "if" }</span>
+func (o *IfOperator) Name() string <span class="cov10" title="15">{ return "if" }</span>
 
-func (o *IfOperator) Validate(instr Instruction) error <span class="cov9" title="11">{
+func (o *IfOperator) Validate(instr Instruction) error <span class="cov8" title="11">{
         if instr.Condition == nil </span><span class="cov1" title="1">{
                 return errors.New("if operator missing 'condition'")
         }</span>
@@ -583,7 +620,7 @@ func (o *IfOperator) Validate(instr Instruction) error <span class="cov9" title=
         <span class="cov8" title="9">if err := validateConditions(instr.Condition); err != nil </span><span class="cov4" title="3">{
                 return err
         }</span>
-        <span class="cov7" title="6">return nil</span>
+        <span class="cov6" title="6">return nil</span>
 }
 
 func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) error <span class="cov6" title="5">{
@@ -603,7 +640,7 @@ func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[strin
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package transform
+		<pre class="file" id="file14" style="display: none">package transform
 
 import (
         "fmt"
@@ -622,7 +659,7 @@ func (o *MapOperator) Validate(instr Instruction) error <span class="cov7" title
         <span class="cov6" title="8">return nil</span>
 }
 
-func (o *MapOperator) Name() string <span class="cov10" title="25">{
+func (o *MapOperator) Name() string <span class="cov10" title="26">{
         return "map"
 }</span>
 
@@ -632,7 +669,7 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
                 return fmt.Errorf("map operator: key %q not found in input", instr.Key)
         }</span>
 
-        <span class="cov6" title="6">arr, ok := arrRaw.([]interface{})
+        <span class="cov5" title="6">arr, ok := arrRaw.([]interface{})
         if !ok </span><span class="cov4" title="3">{
                 return fmt.Errorf("map operator: input[%q] is not an array", instr.Key)
         }</span>
@@ -654,7 +691,7 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package transform
+		<pre class="file" id="file15" style="display: none">package transform
 
 import (
         "fmt"
@@ -662,7 +699,7 @@ import (
 
 type MergeOperator struct{}
 
-func (o *MergeOperator) Name() string <span class="cov10" title="21">{
+func (o *MergeOperator) Name() string <span class="cov10" title="22">{
         return "merge"
 }</span>
 
@@ -699,7 +736,7 @@ func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package transform
+		<pre class="file" id="file16" style="display: none">package transform
 
 import (
         "fmt"
@@ -707,13 +744,13 @@ import (
 
 type SetOperator struct{}
 
-func (s *SetOperator) Name() string <span class="cov10" title="28">{ return "set" }</span>
+func (s *SetOperator) Name() string <span class="cov10" title="29">{ return "set" }</span>
 
-func (s *SetOperator) Validate(instr Instruction) error <span class="cov7" title="10">{
+func (s *SetOperator) Validate(instr Instruction) error <span class="cov7" title="11">{
         if instr.Key == "" </span><span class="cov5" title="6">{
                 return fmt.Errorf("set operator missing 'key'")
         }</span>
-        <span class="cov4" title="4">return nil</span>
+        <span class="cov5" title="5">return nil</span>
 }
 
 func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov6" title="7">{
@@ -721,7 +758,7 @@ func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]i
 }</span>
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package transform
+		<pre class="file" id="file17" style="display: none">package transform
 
 import (
         "fmt"
@@ -730,9 +767,9 @@ import (
 )
 
 // CoerceToMap attempts to cast or reflect a map[string]T into map[string]interface{}
-func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov10" title="62">{
+func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov10" title="64">{
         switch m := v.(type) </span>{
-        case map[string]interface{}:<span class="cov9" title="61">
+        case map[string]interface{}:<span class="cov9" title="63">
                 return m, true</span>
         default:<span class="cov1" title="1">
                 rv := reflect.ValueOf(v)
@@ -749,26 +786,26 @@ func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov1
         }
 }
 
-func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) <span class="cov8" title="37">{
+func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) <span class="cov8" title="38">{
         if path == "" </span><span class="cov0" title="0">{
                 return data, true
         }</span>
 
-        <span class="cov8" title="37">parts := strings.Split(path, ".")
+        <span class="cov8" title="38">parts := strings.Split(path, ".")
         var current interface{} = data
 
-        for _, part := range parts </span><span class="cov8" title="37">{
+        for _, part := range parts </span><span class="cov8" title="39">{
                 m, ok := CoerceToMap(current)
                 if !ok </span><span class="cov0" title="0">{
                         return nil, false
                 }</span>
-                <span class="cov8" title="37">current, ok = m[part]
+                <span class="cov8" title="39">current, ok = m[part]
                 if !ok </span><span class="cov6" title="11">{
                         return nil, false
                 }</span>
         }
 
-        <span class="cov8" title="26">return current, true</span>
+        <span class="cov8" title="27">return current, true</span>
 }
 
 func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov6" title="13">{
@@ -832,7 +869,7 @@ func DeleteValueAtPath(data map[string]interface{}, path string) <span class="co
 }
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">package transform
+		<pre class="file" id="file18" style="display: none">package transform
 
 import (
         "fmt"
@@ -842,7 +879,7 @@ type Registry struct {
         ops map[string]Operator
 }
 
-func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov5" title="14">{
+func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov5" title="15">{
         reg := NewRegistry()
         reg.Register(&amp;SetOperator{})
         reg.Register(&amp;CopyOperator{})
@@ -853,42 +890,42 @@ func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov5" title
         reg.Register(&amp;MergeOperator{})
         reg.Register(&amp;IfOperator{})
         reg.Register(&amp;CoalesceOperator{})
+        reg.Register(&amp;DropIfOperator{})
         for _, op := range optional </span><span class="cov3" title="5">{
                 reg.Register(op)
         }</span>
-        <span class="cov5" title="14">return reg</span>
+        <span class="cov5" title="15">return reg</span>
 }
 
-func NewRegistry() *Registry <span class="cov7" title="39">{
+func NewRegistry() *Registry <span class="cov7" title="40">{
         return &amp;Registry{ops: map[string]Operator{}}
 }</span>
 
-func (r *Registry) Register(op Operator) <span class="cov10" title="175">{
+func (r *Registry) Register(op Operator) <span class="cov10" title="199">{
         name := op.Name()
         if name == "" </span><span class="cov1" title="1">{
                 panic("operator has no name")</span>
         }
-        <span class="cov9" title="174">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
+        <span class="cov9" title="198">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
                 panic(fmt.Sprintf("operator with name '%s' is already registered", name))</span>
         }
-        <span class="cov9" title="173">r.ops[name] = op</span>
+        <span class="cov9" title="197">r.ops[name] = op</span>
 }
 
-func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) bool <span class="cov4" title="8">{
+func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) bool <span class="cov4" title="9">{
         op := r.ops[instr.Op]
         if err := op.Apply(ctx, reg, input, instr); err != nil </span><span class="cov3" title="4">{
                 return ctx.HandleError(err)
         }</span>
-
-        <span class="cov3" title="4">return true</span>
+        <span class="cov3" title="5">return true</span>
 }
 
-func (r *Registry) Find(op string) Operator <span class="cov6" title="21">{
+func (r *Registry) Find(op string) Operator <span class="cov6" title="23">{
         return r.ops[op]
 }</span>
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package transform
+		<pre class="file" id="file19" style="display: none">package transform
 
 import (
         "context"
@@ -901,33 +938,40 @@ type Transformer struct {
 }
 
 // New creates a new Transformer
-func New() *Transformer <span class="cov10" title="8">{
+func New() *Transformer <span class="cov10" title="9">{
         reg := NewDefaultRegistry()
         return &amp;Transformer{reg: reg}
 }</span>
 
-// Apply applies the given transformation definition
-func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) <span class="cov10" title="8">{
+// Apply applies the given transformation definition.
+// NOTE: There is a scenario where both results are nil, meaning this input should be
+// dropped/disregarded as requested by the policy author.
+func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) <span class="cov10" title="9">{
 
         // Validate program before execution
-        if err := ValidateProgram(t.reg, prog); err != nil </span><span class="cov7" title="4">{
+        if err := ValidateProgram(t.reg, prog); err != nil </span><span class="cov6" title="4">{
                 return nil, err
         }</span>
 
         // Create a new context
-        <span class="cov7" title="4">exec := NewExecutionContext(ctx, prog.OnError)
+        <span class="cov7" title="5">exec := NewExecutionContext(ctx, prog.OnError)
         debug, _ := ctx.Value(ContextKeyDebug).(bool)
         exec.Debug = debug
 
         // Create our output, start with the input values
         output := make(map[string]interface{})
-        for k, v := range input </span><span class="cov1" title="1">{
+        for k, v := range input </span><span class="cov3" title="2">{
                 output[k] = v
         }</span>
 
         // Apply instructions
-        <span class="cov7" title="4">for _, instr := range prog.Instructions </span><span class="cov5" title="3">{
-                if !t.reg.Apply(exec, t.reg, output, instr) </span><span class="cov1" title="1">{
+        <span class="cov7" title="5">for _, instr := range prog.Instructions </span><span class="cov6" title="4">{
+                ok := t.reg.Apply(exec, t.reg, output, instr)
+
+                if exec.Dropped </span><span class="cov1" title="1">{
+                        return nil, nil
+                }</span>
+                <span class="cov5" title="3">if !ok </span><span class="cov1" title="1">{
                         return nil, errors.New("execution halted due to an error")
                 }</span>
         }
@@ -950,32 +994,32 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 }
 </pre>
 		
-		<pre class="file" id="file19" style="display: none">package transform
+		<pre class="file" id="file20" style="display: none">package transform
 
 import (
         "fmt"
 )
 
-func ValidateProgram(r *Registry, prog *Program) error <span class="cov10" title="17">{
+func ValidateProgram(r *Registry, prog *Program) error <span class="cov10" title="18">{
         if prog == nil </span><span class="cov1" title="1">{
                 return fmt.Errorf("program is nil")
         }</span>
-        <span class="cov9" title="16">if prog.Version != 1 </span><span class="cov3" title="2">{
+        <span class="cov9" title="17">if prog.Version != 1 </span><span class="cov3" title="2">{
                 return fmt.Errorf("program version %d is unsupported", prog.Version)
         }</span>
 
-        <span class="cov9" title="14">for i, instr := range prog.Instructions </span><span class="cov9" title="13">{
+        <span class="cov9" title="15">for i, instr := range prog.Instructions </span><span class="cov9" title="15">{
                 op := r.Find(instr.Op)
                 if op == nil </span><span class="cov1" title="1">{
                         return fmt.Errorf("instruction #%d: unknown operator '%s'", i, instr.Op)
                 }</span>
 
-                <span class="cov8" title="12">if err := op.Validate(instr); err != nil </span><span class="cov5" title="4">{
+                <span class="cov9" title="14">if err := op.Validate(instr); err != nil </span><span class="cov5" title="4">{
                         return fmt.Errorf("instruction #%d (%s): %w", i, instr.Op, err)
                 }</span>
 
                 // Validate nested instructions (e.g., map, if)
-                <span class="cov7" title="8">if len(instr.Then) &gt; 0 </span><span class="cov1" title="1">{
+                <span class="cov8" title="10">if len(instr.Then) &gt; 0 </span><span class="cov1" title="1">{
                         subProg := &amp;Program{
                                 Version:      prog.Version,
                                 Instructions: instr.Then,
@@ -985,7 +1029,7 @@ func ValidateProgram(r *Registry, prog *Program) error <span class="cov10" title
                         }</span>
                 }
         }
-        <span class="cov7" title="8">return nil</span>
+        <span class="cov7" title="9">return nil</span>
 }
 </pre>
 		
