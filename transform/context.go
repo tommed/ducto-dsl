@@ -9,7 +9,8 @@ type contextKey string
 const ContextKeyDebug contextKey = "ducto-debug"
 
 type ExecutionContext struct {
-	Ctx context.Context
+	Ctx     context.Context
+	Dropped bool // Don't send to the output writer
 
 	OnError string   // "ignore", "fail", "capture"
 	Errors  []string // Collected if OnError = "capture"
@@ -34,7 +35,7 @@ func NewExecutionContext(ctx context.Context, onError string) *ExecutionContext 
 
 func (ctx *ExecutionContext) HandleError(err error) bool {
 	if err == nil {
-		return true // no-op
+		return true
 	}
 
 	switch ctx.OnError {

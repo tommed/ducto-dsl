@@ -19,6 +19,7 @@ func NewDefaultRegistry(optional ...Operator) *Registry {
 	reg.Register(&MergeOperator{})
 	reg.Register(&IfOperator{})
 	reg.Register(&CoalesceOperator{})
+	reg.Register(&DropIfOperator{})
 	for _, op := range optional {
 		reg.Register(op)
 	}
@@ -45,7 +46,6 @@ func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]
 	if err := op.Apply(ctx, reg, input, instr); err != nil {
 		return ctx.HandleError(err)
 	}
-
 	return true
 }
 

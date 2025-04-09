@@ -16,7 +16,9 @@ func New() *Transformer {
 	return &Transformer{reg: reg}
 }
 
-// Apply applies the given transformation definition
+// Apply applies the given transformation definition.
+// NOTE: There is a scenario where both results are nil, meaning this input should be
+// dropped/disregarded as requested by the policy author.
 func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, prog *Program) (map[string]interface{}, error) {
 
 	// Validate program before execution
@@ -37,7 +39,12 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 
 	// Apply instructions
 	for _, instr := range prog.Instructions {
-		if !t.reg.Apply(exec, t.reg, output, instr) {
+		ok := t.reg.Apply(exec, t.reg, output, instr)
+
+		if exec.Dropped {
+			return nil, nil
+		}
+		if !ok {
 			return nil, errors.New("execution halted due to an error")
 		}
 	}
