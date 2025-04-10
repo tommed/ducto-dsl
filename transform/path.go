@@ -71,9 +71,12 @@ func SetValueAtPath(data map[string]interface{}, path string, value interface{})
 
 		next, exists := m[part]
 		if !exists {
-			next = map[string]interface{}{}
-			m[part] = next
+			newMap := map[string]interface{}{}
+			m[part] = newMap
+			current = newMap
+			continue
 		}
+
 		current = next
 	}
 

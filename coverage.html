@@ -91,7 +91,7 @@
 				
 				<option value="file17">github.com/tommed/ducto-dsl/transform/op_string_join.go (100.0%)</option>
 				
-				<option value="file18">github.com/tommed/ducto-dsl/transform/path.go (67.3%)</option>
+				<option value="file18">github.com/tommed/ducto-dsl/transform/path.go (84.2%)</option>
 				
 				<option value="file19">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
 				
@@ -814,22 +814,22 @@ import (
 )
 
 // CoerceToMap attempts to cast or reflect a map[string]T into map[string]interface{}
-func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov10" title="69">{
+func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov10" title="76">{
         switch m := v.(type) </span>{
-        case map[string]interface{}:<span class="cov9" title="68">
+        case map[string]interface{}:<span class="cov9" title="72">
                 return m, true</span>
-        default:<span class="cov1" title="1">
+        default:<span class="cov3" title="4">
                 rv := reflect.ValueOf(v)
-                if rv.Kind() != reflect.Map || rv.Type().Key().Kind() != reflect.String </span><span class="cov1" title="1">{
+                if rv.Kind() != reflect.Map || rv.Type().Key().Kind() != reflect.String </span><span class="cov3" title="3">{
                         return nil, false
                 }</span>
 
-                <span class="cov0" title="0">coerced := make(map[string]interface{}, rv.Len())
-                for _, key := range rv.MapKeys() </span><span class="cov0" title="0">{
+                <span class="cov1" title="1">coerced := make(map[string]interface{}, rv.Len())
+                for _, key := range rv.MapKeys() </span><span class="cov1" title="1">{
                         val := rv.MapIndex(key)
                         coerced[key.String()] = val.Interface()
                 }</span>
-                <span class="cov0" title="0">return coerced, true</span>
+                <span class="cov1" title="1">return coerced, true</span>
         }
 }
 
@@ -852,18 +852,18 @@ func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool
                 }</span>
         }
 
-        <span class="cov8" title="29">return current, true</span>
+        <span class="cov7" title="29">return current, true</span>
 }
 
-func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov6" title="15">{
+func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov6" title="16">{
         if path == "" </span><span class="cov0" title="0">{
                 return fmt.Errorf("cannot set empty path")
         }</span>
 
-        <span class="cov6" title="15">parts := strings.Split(path, ".")
+        <span class="cov6" title="16">parts := strings.Split(path, ".")
         var current interface{} = data
 
-        for i, part := range parts </span><span class="cov6" title="15">{
+        for i, part := range parts </span><span class="cov7" title="18">{
                 isLast := i == len(parts)-1
 
                 m, ok := CoerceToMap(current)
@@ -871,16 +871,19 @@ func SetValueAtPath(data map[string]interface{}, path string, value interface{})
                         return fmt.Errorf("path segment %q is not a map", part)
                 }</span>
 
-                <span class="cov6" title="15">if isLast </span><span class="cov6" title="15">{
+                <span class="cov7" title="18">if isLast </span><span class="cov6" title="16">{
                         m[part] = value
                         return nil
                 }</span>
 
-                <span class="cov0" title="0">next, exists := m[part]
-                if !exists </span><span class="cov0" title="0">{
-                        next = map[string]interface{}{}
-                        m[part] = next
-                }</span>
+                <span class="cov2" title="2">next, exists := m[part]
+                if !exists </span><span class="cov2" title="2">{
+                        newMap := map[string]interface{}{}
+                        m[part] = newMap
+                        current = newMap
+                        continue</span>
+                }
+
                 <span class="cov0" title="0">current = next</span>
         }
 
