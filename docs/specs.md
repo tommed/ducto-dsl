@@ -9,14 +9,10 @@
 
 Ducto DSL Transformations are versioned for obvious reasons. Here are the versions currently available:
 
-## 🟣 Latest Draft
+- [Aggregation Operators](./sped-aggs.md)
+- [DSL Draft v1](./spec-v1.md)
 
-- [Draft v1](./spec-v1.md)
-
-## 🟢 Latest Stable
-
-- No stable version is available
-
-##  🔘 Other Versions
+---
+##  🔘 Older Versions
 
 - No previous versions are available

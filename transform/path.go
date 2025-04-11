@@ -26,6 +26,41 @@ func CoerceToMap(v interface{}) (map[string]interface{}, bool) {
 	}
 }
 
+// CoerceToArray makes sure an array is always a []interface{}.
+// This isn't a problem for JSON, but if the program is deserialized
+// from YAML (as per ducto-orchestrator), it might do smart things like
+// `[]map[string]interface{}` which wouldn't narrow cast as Go doesn't
+// support this.
+func CoerceToArray(val interface{}) ([]interface{}, bool) {
+	if val == nil {
+		return nil, false
+	}
+
+	// Use reflection first for general slices
+	rv := reflect.ValueOf(val)
+	if rv.Kind() == reflect.Slice {
+		out := make([]interface{}, rv.Len())
+		for i := 0; i < rv.Len(); i++ {
+			out[i] = rv.Index(i).Interface()
+		}
+		return out, true
+	}
+
+	// Now check explicitly for known decoded types
+	switch v := val.(type) {
+	case []interface{}:
+		return v, true
+	case []map[string]interface{}:
+		out := make([]interface{}, len(v))
+		for i := range v {
+			out[i] = v[i]
+		}
+		return out, true
+	default:
+		return nil, false
+	}
+}
+
 func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) {
 	if path == "" {
 		return data, true

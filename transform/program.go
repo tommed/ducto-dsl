@@ -20,8 +20,12 @@ type Instruction struct {
 	// Delete
 	Regex bool `json:"regex,omitempty" mapstructure:"regex"`
 
+	// Aggregations
+	Variant string `json:"variant,omitempty" mapstructure:"variant"`
+
 	// Conditional
 	Condition map[string]interface{} `json:"condition,omitempty" mapstructure:"condition"`
+	As        string                 `json:"as,omitempty" mapstructure:"as"`
 	Not       bool                   `json:"not,omitempty" mapstructure:"not"`
 	Then      []Instruction          `json:"then,omitempty" mapstructure:"then"`
 	IfNotSet  bool                   `json:"if_not_set,omitempty" mapstructure:"if_not_set"`

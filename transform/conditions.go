@@ -1,4 +1,3 @@
-// File: ducto-dsl/transform/op_if.go
 package transform
 
 import (

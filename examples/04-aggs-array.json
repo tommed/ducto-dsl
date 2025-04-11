@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "on_error": "capture",
+  "instructions": [
+    {
+      "op": "array_length",
+      "from": "order.items",
+      "to": "summary.item_count"
+    },
+    {
+      "op": "agg_sum",
+      "from": "order.items",
+      "key": "amount",
+      "to": "summary.total_amount"
+    },
+    {
+      "op": "agg_distinct_value",
+      "from": "order.items",
+      "key": "type",
+      "to": "summary.item_types"
+    },
+    {
+      "op": "array_length",
+      "from": "summary.item_types",
+      "to": "summary.distinct_item_type_count"
+    },
+
+    {
+      "op": "filter",
+      "from": "order.items",
+      "condition": {
+        "equals": { "key": "type", "value": "discount" }
+      },
+      "then": [
+        {
+          "op": "agg_sum",
+          "from": "_ctx",
+          "key": "amount",
+          "to": "summary.total_reduced"
+        }
+      ]
+    }
+  ]
+}
