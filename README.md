@@ -59,20 +59,21 @@ Also, see our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md).
 
 ## Example
 
-### `examples/simplest.json`
+### `examples/01-simplest.json`
 
 **Purpose:** Show the simplest possible working example of a Ducto 'program'.
 
 ```json
 {
   "version": 1,
+  "on_error": "fail",
   "instructions": [
     {"op": "set", "key": "greeting", "value": "hello world"}
   ]
 }
 ```
 
-### `examples/enrich-log.json`
+### `examples/02-enrich-log.json`
 
 **Purpose:** Enrich incoming telemetry events with environment defaults, severity mapping, and drop test/debug data.
 
@@ -157,17 +158,17 @@ ducto-dsl lint program.json
 ### Lint
 
 ```bash
-go run ./cmd/ducto-dsl lint examples/simplest.json
+go run ./cmd/ducto-dsl lint examples/01-simplest.json
 ```
 
 ### Run
 
 ```bash
 # Simple Example
-echo '{"foo":"bar"}' | go run ./cmd/ducto-dsl examples/simplest.json
+echo '{"foo":"bar"}' | go run ./cmd/ducto-dsl examples/01-simplest.json
 
 # Telemetry Example
-go run ./cmd/ducto-dsl examples/enrich-log.json < test/data/input-telemetry-log.json
+go run ./cmd/ducto-dsl examples/02-enrich-log.json < test/data/input-telemetry-log.json
 ```
 
 ## Development
