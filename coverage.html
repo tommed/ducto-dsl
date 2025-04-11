@@ -93,21 +93,25 @@
 				
 				<option value="file18">github.com/tommed/ducto-dsl/transform/op_if.go (100.0%)</option>
 				
-				<option value="file19">github.com/tommed/ducto-dsl/transform/op_map.go (100.0%)</option>
+				<option value="file19">github.com/tommed/ducto-dsl/transform/op_json.go (96.6%)</option>
 				
-				<option value="file20">github.com/tommed/ducto-dsl/transform/op_merge.go (93.8%)</option>
+				<option value="file20">github.com/tommed/ducto-dsl/transform/op_map.go (100.0%)</option>
 				
-				<option value="file21">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
+				<option value="file21">github.com/tommed/ducto-dsl/transform/op_merge.go (93.8%)</option>
 				
-				<option value="file22">github.com/tommed/ducto-dsl/transform/op_string_join.go (100.0%)</option>
+				<option value="file22">github.com/tommed/ducto-dsl/transform/op_replace.go (87.8%)</option>
 				
-				<option value="file23">github.com/tommed/ducto-dsl/transform/path.go (80.6%)</option>
+				<option value="file23">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
 				
-				<option value="file24">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
+				<option value="file24">github.com/tommed/ducto-dsl/transform/op_string_join.go (100.0%)</option>
 				
-				<option value="file25">github.com/tommed/ducto-dsl/transform/transformer.go (100.0%)</option>
+				<option value="file25">github.com/tommed/ducto-dsl/transform/path.go (80.6%)</option>
 				
-				<option value="file26">github.com/tommed/ducto-dsl/transform/validate.go (100.0%)</option>
+				<option value="file26">github.com/tommed/ducto-dsl/transform/registry.go (100.0%)</option>
+				
+				<option value="file27">github.com/tommed/ducto-dsl/transform/transformer.go (100.0%)</option>
+				
+				<option value="file28">github.com/tommed/ducto-dsl/transform/validate.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -891,8 +895,7 @@ func (f FailOperator) Apply(_ *ExecutionContext, _ *Registry, _ map[string]inter
 }</span>
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">// File: ducto-dsl/transform/op_filter.go
-package transform
+		<pre class="file" id="file17" style="display: none">package transform
 
 import (
         "fmt"
@@ -1009,6 +1012,72 @@ func (o *IfOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[strin
 		<pre class="file" id="file19" style="display: none">package transform
 
 import (
+        "encoding/json"
+        "fmt"
+)
+
+type ToJSONOperator struct{}
+
+func (o *ToJSONOperator) Name() string <span class="cov10" title="18">{ return "to_json" }</span>
+
+func (o *ToJSONOperator) Validate(instr Instruction) error <span class="cov4" title="3">{
+        if instr.From == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("to_json: missing 'from'")
+        }</span>
+        <span class="cov3" title="2">if instr.To == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("to_json: missing 'to'")
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (o *ToJSONOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov3" title="2">{
+        val, ok := GetValueAtPath(input, instr.From)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("to_json: 'from' path not found: %s", instr.From)
+        }</span>
+        <span class="cov1" title="1">data, err := json.Marshal(val)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("to_json: failed to marshal value: %w", err)
+        }</span>
+        <span class="cov1" title="1">return SetValueAtPath(input, instr.To, string(data))</span>
+}
+
+// ---
+
+type FromJSONOperator struct{}
+
+func (o *FromJSONOperator) Name() string <span class="cov10" title="18">{ return "from_json" }</span>
+
+func (o *FromJSONOperator) Validate(instr Instruction) error <span class="cov4" title="3">{
+        if instr.From == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("from_json: missing 'from'")
+        }</span>
+        <span class="cov3" title="2">if instr.To == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("from_json: missing 'to'")
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (o *FromJSONOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov5" title="4">{
+        val, ok := GetValueAtPath(input, instr.From)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("from_json: 'from' path not found: %s", instr.From)
+        }</span>
+        <span class="cov4" title="3">str, ok := val.(string)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("from_json: value at 'from' is not a string")
+        }</span>
+        <span class="cov3" title="2">var out interface{}
+        if err := json.Unmarshal([]byte(str), &amp;out); err != nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("from_json: failed to unmarshal JSON: %w", err)
+        }</span>
+        <span class="cov1" title="1">return SetValueAtPath(input, instr.To, out)</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package transform
+
+import (
         "fmt"
 )
 
@@ -1057,7 +1126,7 @@ func (o *MapOperator) Apply(ctx *ExecutionContext, reg *Registry, input map[stri
 }
 </pre>
 		
-		<pre class="file" id="file20" style="display: none">package transform
+		<pre class="file" id="file21" style="display: none">package transform
 
 import (
         "fmt"
@@ -1102,7 +1171,105 @@ func (o *MergeOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string
 }
 </pre>
 		
-		<pre class="file" id="file21" style="display: none">package transform
+		<pre class="file" id="file22" style="display: none">package transform
+
+import (
+        "fmt"
+        "regexp"
+        "strings"
+)
+
+// ReplaceOperator is for simple string replace all
+type ReplaceOperator struct{}
+
+func (o *ReplaceOperator) Name() string <span class="cov10" title="18">{ return "replace" }</span>
+
+func (o *ReplaceOperator) Validate(instr Instruction) error <span class="cov5" title="4">{
+        if instr.From == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: missing 'from'")
+        }</span>
+        <span class="cov4" title="3">if instr.To == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: missing 'to'")
+        }</span>
+        <span class="cov3" title="2">if instr.Key == "" </span><span class="cov0" title="0">{
+                return fmt.Errorf("replace: missing 'key' (match)")
+        }</span>
+        <span class="cov3" title="2">if instr.Value == nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: missing 'value' (replacement)")
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (o *ReplaceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov4" title="3">{
+        val, ok := GetValueAtPath(input, instr.From)
+        if !ok </span><span class="cov0" title="0">{
+                return fmt.Errorf("replace: 'from' path not found: %s", instr.From)
+        }</span>
+        <span class="cov4" title="3">src, ok := val.(string)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: value at 'from' is not a string")
+        }</span>
+
+        <span class="cov3" title="2">match := instr.Key
+        replacement, ok := instr.Value.(string)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: 'value' must be a string")
+        }</span>
+
+        <span class="cov1" title="1">out := strings.ReplaceAll(src, match, replacement)
+        return SetValueAtPath(input, instr.To, out)</span>
+}
+
+// RegexReplaceOperator is for regex string replaces
+type RegexReplaceOperator struct{}
+
+func (o *RegexReplaceOperator) Name() string <span class="cov10" title="18">{ return "regex_replace" }</span>
+
+func (o *RegexReplaceOperator) Validate(instr Instruction) error <span class="cov6" title="5">{
+        if instr.From == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("regex_replace: missing 'from'")
+        }</span>
+        <span class="cov5" title="4">if instr.To == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("regex_replace: missing 'to'")
+        }</span>
+        <span class="cov4" title="3">if instr.Key == "" </span><span class="cov0" title="0">{
+                return fmt.Errorf("regex_replace: missing 'key' (regex pattern)")
+        }</span>
+        <span class="cov4" title="3">if instr.Value == nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("regex_replace: missing 'value' (replacement string)")
+        }</span>
+        <span class="cov3" title="2">_, err := regexp.Compile(instr.Key)
+        if err != nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("regex_replace: invalid regex: %w", err)
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (o *RegexReplaceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov4" title="3">{
+        val, ok := GetValueAtPath(input, instr.From)
+        if !ok </span><span class="cov0" title="0">{
+                return fmt.Errorf("regex_replace: 'from' path not found: %s", instr.From)
+        }</span>
+        <span class="cov4" title="3">src, ok := val.(string)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("regex_replace: value at 'from' is not a string")
+        }</span>
+
+        <span class="cov3" title="2">re, err := regexp.Compile(instr.Key)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("regex_replace: invalid regex: %w", err)
+        }</span>
+        <span class="cov3" title="2">replacement, ok := instr.Value.(string)
+        if !ok </span><span class="cov0" title="0">{
+                return fmt.Errorf("regex_replace: 'value' must be a string")
+        }</span>
+
+        <span class="cov3" title="2">result := re.ReplaceAllString(src, replacement)
+        return SetValueAtPath(input, instr.To, result)</span>
+}
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package transform
 
 import (
         "fmt"
@@ -1124,7 +1291,7 @@ func (s *SetOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]i
 }</span>
 </pre>
 		
-		<pre class="file" id="file22" style="display: none">package transform
+		<pre class="file" id="file24" style="display: none">package transform
 
 import (
         "errors"
@@ -1169,7 +1336,7 @@ func (o *StringJoinOperator) Apply(_ *ExecutionContext, _ *Registry, input map[s
 }
 </pre>
 		
-		<pre class="file" id="file23" style="display: none">package transform
+		<pre class="file" id="file25" style="display: none">package transform
 
 import (
         "fmt"
@@ -1178,9 +1345,9 @@ import (
 )
 
 // CoerceToMap attempts to cast or reflect a map[string]T into map[string]interface{}
-func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov10" title="220">{
+func CoerceToMap(v interface{}) (map[string]interface{}, bool) <span class="cov10" title="237">{
         switch m := v.(type) </span>{
-        case map[string]interface{}:<span class="cov9" title="213">
+        case map[string]interface{}:<span class="cov9" title="230">
                 return m, true</span>
         default:<span class="cov4" title="7">
                 rv := reflect.ValueOf(v)
@@ -1232,37 +1399,37 @@ func CoerceToArray(val interface{}) ([]interface{}, bool) <span class="cov6" tit
         }
 }
 
-func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) <span class="cov8" title="110">{
+func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool) <span class="cov8" title="122">{
         if path == "" </span><span class="cov0" title="0">{
                 return data, true
         }</span>
 
-        <span class="cov8" title="110">parts := strings.Split(path, ".")
+        <span class="cov8" title="122">parts := strings.Split(path, ".")
         var current interface{} = data
 
-        for _, part := range parts </span><span class="cov8" title="116">{
+        for _, part := range parts </span><span class="cov8" title="128">{
                 m, ok := CoerceToMap(current)
                 if !ok </span><span class="cov0" title="0">{
                         return nil, false
                 }</span>
-                <span class="cov8" title="116">current, ok = m[part]
-                if !ok </span><span class="cov6" title="22">{
+                <span class="cov8" title="128">current, ok = m[part]
+                if !ok </span><span class="cov6" title="24">{
                         return nil, false
                 }</span>
         }
 
-        <span class="cov8" title="88">return current, true</span>
+        <span class="cov8" title="98">return current, true</span>
 }
 
-func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov6" title="34">{
+func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov7" title="39">{
         if path == "" </span><span class="cov0" title="0">{
                 return fmt.Errorf("cannot set empty path")
         }</span>
 
-        <span class="cov6" title="34">parts := strings.Split(path, ".")
+        <span class="cov7" title="39">parts := strings.Split(path, ".")
         var current interface{} = data
 
-        for i, part := range parts </span><span class="cov7" title="43">{
+        for i, part := range parts </span><span class="cov7" title="48">{
                 isLast := i == len(parts)-1
 
                 m, ok := CoerceToMap(current)
@@ -1270,7 +1437,7 @@ func SetValueAtPath(data map[string]interface{}, path string, value interface{})
                         return fmt.Errorf("path segment %q is not a map", part)
                 }</span>
 
-                <span class="cov7" title="43">if isLast </span><span class="cov6" title="34">{
+                <span class="cov7" title="48">if isLast </span><span class="cov7" title="39">{
                         m[part] = value
                         return nil
                 }</span>
@@ -1318,7 +1485,7 @@ func DeleteValueAtPath(data map[string]interface{}, path string) <span class="co
 }
 </pre>
 		
-		<pre class="file" id="file24" style="display: none">package transform
+		<pre class="file" id="file26" style="display: none">package transform
 
 import (
         "fmt"
@@ -1345,6 +1512,10 @@ func NewDefaultRegistry(optional ...Operator) *Registry <span class="cov5" title
         reg.Register(&amp;AggSumOperator{})
         reg.Register(&amp;AggDistinctOperator{})
         reg.Register(&amp;FilterOperator{})
+        reg.Register(&amp;ToJSONOperator{})
+        reg.Register(&amp;FromJSONOperator{})
+        reg.Register(&amp;ReplaceOperator{})
+        reg.Register(&amp;RegexReplaceOperator{})
         for _, op := range optional </span><span class="cov3" title="5">{
                 reg.Register(op)
         }</span>
@@ -1355,15 +1526,15 @@ func NewRegistry() *Registry <span class="cov6" title="42">{
         return &amp;Registry{ops: map[string]Operator{}}
 }</span>
 
-func (r *Registry) Register(op Operator) <span class="cov10" title="304">{
+func (r *Registry) Register(op Operator) <span class="cov10" title="372">{
         name := op.Name()
         if name == "" </span><span class="cov1" title="1">{
                 panic("operator has no name")</span>
         }
-        <span class="cov9" title="303">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
+        <span class="cov9" title="371">if _, exists := r.ops[name]; exists </span><span class="cov1" title="1">{
                 panic(fmt.Sprintf("operator with name '%s' is already registered", name))</span>
         }
-        <span class="cov9" title="302">r.ops[name] = op</span>
+        <span class="cov9" title="370">r.ops[name] = op</span>
 }
 
 func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]interface{}, instr Instruction) bool <span class="cov4" title="10">{
@@ -1374,12 +1545,12 @@ func (r *Registry) Apply(ctx *ExecutionContext, reg *Registry, input map[string]
         <span class="cov3" title="6">return true</span>
 }
 
-func (r *Registry) Find(op string) Operator <span class="cov6" title="25">{
+func (r *Registry) Find(op string) Operator <span class="cov5" title="25">{
         return r.ops[op]
 }</span>
 </pre>
 		
-		<pre class="file" id="file25" style="display: none">package transform
+		<pre class="file" id="file27" style="display: none">package transform
 
 import (
         "context"
@@ -1448,7 +1619,7 @@ func (t *Transformer) Apply(ctx context.Context, input map[string]interface{}, p
 }
 </pre>
 		
-		<pre class="file" id="file26" style="display: none">package transform
+		<pre class="file" id="file28" style="display: none">package transform
 
 import (
         "fmt"

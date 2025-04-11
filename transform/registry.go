@@ -25,6 +25,10 @@ func NewDefaultRegistry(optional ...Operator) *Registry {
 	reg.Register(&AggSumOperator{})
 	reg.Register(&AggDistinctOperator{})
 	reg.Register(&FilterOperator{})
+	reg.Register(&ToJSONOperator{})
+	reg.Register(&FromJSONOperator{})
+	reg.Register(&ReplaceOperator{})
+	reg.Register(&RegexReplaceOperator{})
 	for _, op := range optional {
 		reg.Register(op)
 	}

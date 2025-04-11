@@ -1,4 +1,3 @@
-// File: ducto-dsl/transform/op_agg_avg_test.go
 package transform_test
 
 import (

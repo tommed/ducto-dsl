@@ -44,21 +44,26 @@ By default, if an operation is not successful the program will continue anyway. 
 
 ## 🟣 Operators
 
-| Op              | Description                                    | Parameters                            | Notes                                                                                              |
-|-----------------|------------------------------------------------|---------------------------------------|----------------------------------------------------------------------------------------------------|
-| `set`           | Assigns a value to a key                       | `key`, `value`                        | Supports nested keys via dot notation (optional)                                                   |
-| `copy`          | Copies value from one key to another           | `from`, `to`                          | Useful for reorganizing input                                                                      |
-| `delete`        | Removes a key from the map                     | `key`, `regex` (bool)                 | Supports nested keys                                                                               |
-| `noop`          | No-Operation (no-op) does nothing              | _(none)_                              | Mostly for unit testing, always passes, does nothing to the input                                  |
-| `fail`          | Always raises an error                         | `value` (string)                      | Useful inside `if` statement for validation, but mostly for unit tests                             |
-| `map`           | Applies a sub-program to each item in an array | `key`, `then`                         | Recursively processes arrays                                                                       |
-| `merge`         | Patches values in `value` to the root map      | `value` (object), `if_not_set` (bool) | Could merge defaults or config                                                                     |
-| `if`            | Conditionally applies sub-instructions         | `condition`, `not` (bool), `then`     | See Special Case below                                                                             |
-| `coalesce`      | Defaults a field value if unset                | `key`, `value`                        | Convenience for a set, if empty                                                                    |
-| `replace`       | Performs a string replace                      | `key`, `match`, `with`                | Useful for cleaning values                                                                         |
-| `regex_replace` | Performs a regular expression replacement      | `key`, `match`, `with`                | Useful for pattern matching, supports Golang's capture groups via `$1`, `$2`, etc.                 |
-| `to_json`       | Marshals value to a JSON string                | `from`, `to`                          | Useful for objects, can also be used to stringify primitives                                       |
-| `from_json`     | Unmarshal a JSON string to an Object           | `from`, `to`                          | Useful for converting JSON strings into complex objects to be manipulated by other operations here |
+| Op                   | Description                                    | Parameters                                   | Notes                                                                                              |
+|----------------------|------------------------------------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `set`                | Assigns a value to a key                       | `key`, `value`                               | Supports nested keys via dot notation (optional)                                                   |
+| `copy`               | Copies value from one key to another           | `from`, `to`                                 | Useful for reorganizing input                                                                      |
+| `delete`             | Removes a key from the map                     | `key`, `regex` (bool)                        | Supports nested keys                                                                               |
+| `noop`               | No-Operation (no-op) does nothing              | _(none)_                                     | Mostly for unit testing, always passes, does nothing to the input                                  |
+| `fail`               | Always raises an error                         | `value` (string)                             | Useful inside `if` statement for validation, but mostly for unit tests                             |
+| `map`                | Applies a sub-program to each item in an array | `key`, `then`                                | Recursively processes arrays                                                                       |
+| `merge`              | Patches values in `value` to the root map      | `value` (object), `if_not_set` (bool)        | Could merge defaults or config                                                                     |
+| `if`                 | Conditionally applies sub-instructions         | `condition`, `not` (bool), `then`            | See Special Case below                                                                             |
+| `coalesce`           | Defaults a field value if unset                | `key`, `value`                               | Convenience for a set, if empty                                                                    |
+| `to_json`            | Marshals value to a JSON string                | `from`, `to`                                 | Useful for objects, can also be used to stringify primitives                                       |
+| `from_json`          | Unmarshal a JSON string to an Object           | `from`, `to`                                 | Useful for converting JSON strings into complex objects to be manipulated by other operations here |
+| `filter`             | Ability to conditionally select items          | `from`, `condition`, `as` (optional), `then` | Great mixed with aggregation operators to count/sum a sub-set of values in an array                |
+| `array_length`       | The number of items in an array                | `from`, `to`                                 | See [the Aggregations Spec](./spec-aggs.md) for more info                                          |
+| `agg_sum`            | A sum of numeric values in an array            | `from`, `to`, `key`                          | See [the Aggregations Spec](./spec-aggs.md) for more info                                          |
+| `agg_avg`            | An average of numeric values in an array       | `variant`, `from`, `to`, `key`               | Supports mean, mode, and medium. See [the Aggregations Spec](./spec-aggs.md) for more info         |
+| `agg_distinct_value` | Get a list of distinct values from an array    | `from`, `to`, `key`                          | See [the Aggregations Spec](./spec-aggs.md) for more info                                          |
+| `replace`            | Performs a string replace                      | `key`, `match`, `with`                       | Useful for cleaning values                                                                         |
+| `regex_replace`      | Performs a regular expression replacement      | `key`, `match`, `with`                       | Useful for pattern matching, supports Golang's capture groups via `$1`, `$2`, etc.                 |
 
 ### 🟡 Special Cases
 
@@ -130,3 +135,4 @@ The following conditions currently exist:
 - Nested programs are permitted for:
   - `map` (array processing)
   - `if` (conditional branching)
+  - `filter` (filtering arrays by item values)
