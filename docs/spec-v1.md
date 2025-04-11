@@ -62,8 +62,8 @@ By default, if an operation is not successful the program will continue anyway. 
 | `agg_sum`            | A sum of numeric values in an array            | `from`, `to`, `key`                          | See [the Aggregations Spec](./spec-aggs.md) for more info                                          |
 | `agg_avg`            | An average of numeric values in an array       | `variant`, `from`, `to`, `key`               | Supports mean, mode, and medium. See [the Aggregations Spec](./spec-aggs.md) for more info         |
 | `agg_distinct_value` | Get a list of distinct values from an array    | `from`, `to`, `key`                          | See [the Aggregations Spec](./spec-aggs.md) for more info                                          |
-| `replace`            | Performs a string replace                      | `key`, `match`, `with`                       | Useful for cleaning values                                                                         |
-| `regex_replace`      | Performs a regular expression replacement      | `key`, `match`, `with`                       | Useful for pattern matching, supports Golang's capture groups via `$1`, `$2`, etc.                 |
+| `replace`            | Performs a string replace                      | `key`, `match`, `with`, `to` (optional)      | Useful for cleaning values                                                                         |
+| `regex_replace`      | Performs a regular expression replacement      | `key`, `match`, `with`, `to` (optional)      | Useful for pattern matching, supports Golang's capture groups via `$1`, `$2`, etc.                 |
 
 ### 🟡 Special Cases
 

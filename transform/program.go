@@ -20,6 +20,10 @@ type Instruction struct {
 	// Delete
 	Regex bool `json:"regex,omitempty" mapstructure:"regex"`
 
+	// Replace
+	Match string `json:"match,omitempty" mapstructure:"match"`
+	With  string `json:"with,omitempty" mapstructure:"with"`
+
 	// Aggregations
 	Variant string `json:"variant,omitempty" mapstructure:"variant"`
 
