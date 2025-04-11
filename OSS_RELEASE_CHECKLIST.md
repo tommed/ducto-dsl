@@ -17,7 +17,7 @@
 - [x] `docs/` folder exists and contains:
     - [x] Specification
   - [ ] Architecture diagram (optional)
-  - [ ] Example(s)
+  - [x] Example(s)
 - [x] All operators have:
     - [x] Unit tests
     - [x] Validation implemented
