@@ -14,10 +14,11 @@ func TestReplaceOperator_Name(t *testing.T) {
 
 func TestReplaceOperator_Validate(t *testing.T) {
 	op := &transform.ReplaceOperator{}
+	assert.Error(t, op.Validate(transform.Instruction{Key: "x"}))
 	assert.Error(t, op.Validate(transform.Instruction{To: "x"}))
-	assert.Error(t, op.Validate(transform.Instruction{From: "x"}))
-	assert.Error(t, op.Validate(transform.Instruction{From: "x", To: "y", Key: "foo"}))
-	assert.NoError(t, op.Validate(transform.Instruction{From: "x", To: "y", Key: "foo", Value: "bar"}))
+	assert.Error(t, op.Validate(transform.Instruction{Key: "x", To: "y", Match: "foo"}))
+	assert.NoError(t, op.Validate(transform.Instruction{Key: "x", To: "y", Match: "foo", With: "bar"}))
+	assert.NoError(t, op.Validate(transform.Instruction{Key: "x", Match: "foo", With: "bar"}))
 }
 
 func TestReplaceOperator_Apply(t *testing.T) {
@@ -26,7 +27,7 @@ func TestReplaceOperator_Apply(t *testing.T) {
 	t.Run("basic replace", func(t *testing.T) {
 		input := map[string]interface{}{"text": "abc123abc"}
 		instr := transform.Instruction{
-			From: "text", To: "out", Key: "abc", Value: "X",
+			Key: "text", To: "out", Match: "abc", With: "X",
 		}
 		err := op.Apply(nil, nil, input, instr)
 		assert.NoError(t, err)
@@ -40,9 +41,9 @@ func TestReplaceOperator_Apply(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("invalid value type", func(t *testing.T) {
-		input := map[string]interface{}{"text": "hello"}
-		instr := transform.Instruction{From: "text", To: "out", Key: "e", Value: 123}
+	t.Run("invalid match type", func(t *testing.T) {
+		input := map[string]interface{}{"text": 123}
+		instr := transform.Instruction{Key: "text", To: "out", Match: "e", Value: 123}
 		err := op.Apply(nil, nil, input, instr)
 		assert.Error(t, err)
 	})
@@ -55,10 +56,12 @@ func TestRegexReplaceOperator_Name(t *testing.T) {
 
 func TestRegexReplaceOperator_Validate(t *testing.T) {
 	op := &transform.RegexReplaceOperator{}
-	assert.Error(t, op.Validate(transform.Instruction{To: "x"}))
-	assert.Error(t, op.Validate(transform.Instruction{From: "x"}))
-	assert.Error(t, op.Validate(transform.Instruction{From: "x", To: "y", Key: "["}))
-	assert.NoError(t, op.Validate(transform.Instruction{From: "x", To: "y", Key: "abc", Value: "z"}))
+	assert.Error(t, op.Validate(transform.Instruction{Key: "x"}))
+	assert.Error(t, op.Validate(transform.Instruction{Match: "x"}))
+	assert.Error(t, op.Validate(transform.Instruction{Key: "x", Match: "y", To: "["}))
+	assert.Error(t, op.Validate(transform.Instruction{Key: "x", Match: "(\\.{", With: ""}))
+	assert.NoError(t, op.Validate(transform.Instruction{Key: "x", To: "y", Match: "abc", With: "z"}))
+	assert.NoError(t, op.Validate(transform.Instruction{Key: "x", Match: "abc", With: "z"}))
 }
 
 func TestRegexReplaceOperator_Apply(t *testing.T) {
@@ -66,7 +69,7 @@ func TestRegexReplaceOperator_Apply(t *testing.T) {
 
 	t.Run("basic regex replace", func(t *testing.T) {
 		input := map[string]interface{}{"msg": "error: failed"}
-		instr := transform.Instruction{From: "msg", To: "cleaned", Key: `error: `, Value: ""}
+		instr := transform.Instruction{Key: "msg", To: "cleaned", Match: `error: `, With: ""}
 		err := op.Apply(nil, nil, input, instr)
 		assert.NoError(t, err)
 		assert.Equal(t, "failed", input["cleaned"])
@@ -75,8 +78,8 @@ func TestRegexReplaceOperator_Apply(t *testing.T) {
 	t.Run("with capture groups", func(t *testing.T) {
 		input := map[string]interface{}{"val": "123-456"}
 		instr := transform.Instruction{
-			From: "val", To: "swapped",
-			Key: `^(\d+)-(\d+)$`, Value: `$2/$1`,
+			Key: "val", To: "swapped",
+			Match: `^(\d+)-(\d+)$`, With: `$2/$1`,
 		}
 		err := op.Apply(nil, nil, input, instr)
 		assert.NoError(t, err)

@@ -99,7 +99,7 @@
 				
 				<option value="file21">github.com/tommed/ducto-dsl/transform/op_merge.go (93.8%)</option>
 				
-				<option value="file22">github.com/tommed/ducto-dsl/transform/op_replace.go (87.8%)</option>
+				<option value="file22">github.com/tommed/ducto-dsl/transform/op_replace.go (93.3%)</option>
 				
 				<option value="file23">github.com/tommed/ducto-dsl/transform/op_set.go (100.0%)</option>
 				
@@ -1184,39 +1184,36 @@ type ReplaceOperator struct{}
 
 func (o *ReplaceOperator) Name() string <span class="cov10" title="18">{ return "replace" }</span>
 
-func (o *ReplaceOperator) Validate(instr Instruction) error <span class="cov5" title="4">{
-        if instr.From == "" </span><span class="cov1" title="1">{
-                return fmt.Errorf("replace: missing 'from'")
+func (o *ReplaceOperator) Validate(instr Instruction) error <span class="cov6" title="5">{
+        if instr.Key == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: missing 'key'")
         }</span>
-        <span class="cov4" title="3">if instr.To == "" </span><span class="cov1" title="1">{
-                return fmt.Errorf("replace: missing 'to'")
+        <span class="cov5" title="4">if instr.Match == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: missing 'match'")
         }</span>
-        <span class="cov3" title="2">if instr.Key == "" </span><span class="cov0" title="0">{
-                return fmt.Errorf("replace: missing 'key' (match)")
+        <span class="cov4" title="3">if instr.With == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: missing 'with' (replacement)")
         }</span>
-        <span class="cov3" title="2">if instr.Value == nil </span><span class="cov1" title="1">{
-                return fmt.Errorf("replace: missing 'value' (replacement)")
+        <span class="cov3" title="2">if instr.To == "" </span><span class="cov1" title="1">{
+                instr.To = instr.Key
         }</span>
-        <span class="cov1" title="1">return nil</span>
+        <span class="cov3" title="2">return nil</span>
 }
 
 func (o *ReplaceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov4" title="3">{
-        val, ok := GetValueAtPath(input, instr.From)
-        if !ok </span><span class="cov0" title="0">{
-                return fmt.Errorf("replace: 'from' path not found: %s", instr.From)
-        }</span>
-        <span class="cov4" title="3">src, ok := val.(string)
+        val, ok := GetValueAtPath(input, instr.Key)
         if !ok </span><span class="cov1" title="1">{
-                return fmt.Errorf("replace: value at 'from' is not a string")
+                return fmt.Errorf("replace: 'key' path not found: %s", instr.Key)
+        }</span>
+        <span class="cov3" title="2">src, ok := val.(string)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("replace: value at 'key' is not a string")
         }</span>
 
-        <span class="cov3" title="2">match := instr.Key
-        replacement, ok := instr.Value.(string)
-        if !ok </span><span class="cov1" title="1">{
-                return fmt.Errorf("replace: 'value' must be a string")
-        }</span>
+        <span class="cov1" title="1">match := instr.Match
+        replacement := instr.With
 
-        <span class="cov1" title="1">out := strings.ReplaceAll(src, match, replacement)
+        out := strings.ReplaceAll(src, match, replacement)
         return SetValueAtPath(input, instr.To, out)</span>
 }
 
@@ -1225,46 +1222,42 @@ type RegexReplaceOperator struct{}
 
 func (o *RegexReplaceOperator) Name() string <span class="cov10" title="18">{ return "regex_replace" }</span>
 
-func (o *RegexReplaceOperator) Validate(instr Instruction) error <span class="cov6" title="5">{
-        if instr.From == "" </span><span class="cov1" title="1">{
-                return fmt.Errorf("regex_replace: missing 'from'")
+func (o *RegexReplaceOperator) Validate(instr Instruction) error <span class="cov7" title="7">{
+        if instr.Key == "" </span><span class="cov1" title="1">{
+                return fmt.Errorf("regex_replace: missing 'key'")
         }</span>
-        <span class="cov5" title="4">if instr.To == "" </span><span class="cov1" title="1">{
-                return fmt.Errorf("regex_replace: missing 'to'")
+        <span class="cov6" title="6">if instr.Match == "" </span><span class="cov3" title="2">{
+                return fmt.Errorf("regex_replace: missing 'match' (regex pattern)")
         }</span>
-        <span class="cov4" title="3">if instr.Key == "" </span><span class="cov0" title="0">{
-                return fmt.Errorf("regex_replace: missing 'key' (regex pattern)")
+        <span class="cov5" title="4">if instr.With == "" </span><span class="cov3" title="2">{
+                return fmt.Errorf("regex_replace: missing 'with' (replacement string)")
         }</span>
-        <span class="cov4" title="3">if instr.Value == nil </span><span class="cov1" title="1">{
-                return fmt.Errorf("regex_replace: missing 'value' (replacement string)")
+        <span class="cov3" title="2">if instr.To == "" </span><span class="cov1" title="1">{
+                instr.To = instr.Key
         }</span>
-        <span class="cov3" title="2">_, err := regexp.Compile(instr.Key)
-        if err != nil </span><span class="cov1" title="1">{
-                return fmt.Errorf("regex_replace: invalid regex: %w", err)
-        }</span>
-        <span class="cov1" title="1">return nil</span>
-}
-
-func (o *RegexReplaceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov4" title="3">{
-        val, ok := GetValueAtPath(input, instr.From)
-        if !ok </span><span class="cov0" title="0">{
-                return fmt.Errorf("regex_replace: 'from' path not found: %s", instr.From)
-        }</span>
-        <span class="cov4" title="3">src, ok := val.(string)
-        if !ok </span><span class="cov1" title="1">{
-                return fmt.Errorf("regex_replace: value at 'from' is not a string")
-        }</span>
-
-        <span class="cov3" title="2">re, err := regexp.Compile(instr.Key)
+        <span class="cov3" title="2">_, err := regexp.Compile(instr.Match)
         if err != nil </span><span class="cov0" title="0">{
                 return fmt.Errorf("regex_replace: invalid regex: %w", err)
         }</span>
-        <span class="cov3" title="2">replacement, ok := instr.Value.(string)
+        <span class="cov3" title="2">return nil</span>
+}
+
+func (o *RegexReplaceOperator) Apply(_ *ExecutionContext, _ *Registry, input map[string]interface{}, instr Instruction) error <span class="cov4" title="3">{
+        val, ok := GetValueAtPath(input, instr.Key)
+        if !ok </span><span class="cov1" title="1">{
+                return fmt.Errorf("regex_replace: 'key' path not found: %s", instr.From)
+        }</span>
+        <span class="cov3" title="2">src, ok := val.(string)
         if !ok </span><span class="cov0" title="0">{
-                return fmt.Errorf("regex_replace: 'value' must be a string")
+                return fmt.Errorf("regex_replace: value at 'key' is not a string")
         }</span>
 
-        <span class="cov3" title="2">result := re.ReplaceAllString(src, replacement)
+        <span class="cov3" title="2">re, err := regexp.Compile(instr.Match)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("regex_replace: invalid regex: %w", err)
+        }</span>
+        <span class="cov3" title="2">replacement := instr.With
+        result := re.ReplaceAllString(src, replacement)
         return SetValueAtPath(input, instr.To, result)</span>
 }
 </pre>
@@ -1413,12 +1406,12 @@ func GetValueAtPath(data map[string]interface{}, path string) (interface{}, bool
                         return nil, false
                 }</span>
                 <span class="cov8" title="128">current, ok = m[part]
-                if !ok </span><span class="cov6" title="24">{
+                if !ok </span><span class="cov6" title="26">{
                         return nil, false
                 }</span>
         }
 
-        <span class="cov8" title="98">return current, true</span>
+        <span class="cov8" title="96">return current, true</span>
 }
 
 func SetValueAtPath(data map[string]interface{}, path string, value interface{}) error <span class="cov7" title="39">{
