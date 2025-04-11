@@ -48,7 +48,7 @@ See [doc/specs.md](docs/specs.md) for a specification of the DSL.
 - [x] [Support for basics `map`, `delete`, `merge`](./docs/spec-v1.md)
 - [x] Linter included for instruction validation
 - [x] Conditionals
-- [x] [Aggregations and Filtering](./docs/sped-aggs.md)
+- [x] [Aggregations and Filtering](./docs/spec-aggs)
 - [x] Embeddable Go SDK
 - [ ] Input can be JSON or YAML
 - [ ] HCL-powered syntax option
