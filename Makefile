@@ -13,7 +13,7 @@ LINTER_OPTS=--timeout=2m
 # General Targets
 # ----------------------
 
-.PHONY: all check ci lint test test-full coverage clean run-example-simplest run-example-map build-all ducto-dsl-macos ducto-dsl-windows
+.PHONY: all check ci lint test test-full coverage clean run-example-simplest run-example-map build-all ducto-dsl-macos ducto-dsl-windows run-aggs-array
 
 all: check
 
@@ -21,7 +21,7 @@ check: lint test-full coverage
 
 build-all: ducto-dsl-macos ducto-dsl-windows
 
-ci: check run-example-simplest run-example-map build-all
+ci: check run-example-simplest run-example-map run-aggs-array build-all
 
 clean:
 	@rm -f $(COVERAGE_OUT) $(COVERAGE_HTML) ducto-dsl*
@@ -66,6 +66,10 @@ run-example-simplest:
 run-example-map:
 	@echo "==> Running map example"
 	@cat test/data/input.json | $(GO) run ./cmd/ducto-dsl examples/03-change-array.json
+
+run-aggs-array:
+	@echo "==> Running aggs_array example"
+	@$(GO) run ./cmd/ducto-dsl examples/04-aggs-array.json < examples/04-aggs-array-input-01.json
 
 ducto-dsl-macos:
 	@echo "==> Building macOS CLI"

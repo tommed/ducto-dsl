@@ -22,7 +22,7 @@ func ValidateProgram(r *Registry, prog *Program) error {
 			return fmt.Errorf("instruction #%d (%s): %w", i, instr.Op, err)
 		}
 
-		// Validate nested instructions (e.g., map, if)
+		// Validate nested instructions (e.g., map, if, filter)
 		if len(instr.Then) > 0 {
 			subProg := &Program{
 				Version:      prog.Version,
