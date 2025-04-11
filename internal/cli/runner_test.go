@@ -25,7 +25,7 @@ func Test_RunCLI(t *testing.T) {
 			name: "simplest",
 			args: args{
 				input: goodInput,
-				args:  []string{"../../examples/simplest.json"},
+				args:  []string{"../../examples/01-simplest.json"},
 			},
 			want:         0,
 			wantContains: `"foo": "bar"`,
@@ -61,7 +61,7 @@ func Test_RunCLI(t *testing.T) {
 			name: "invalid json input piped in",
 			args: args{
 				input: `{`,
-				args:  []string{"../../examples/simplest.json"},
+				args:  []string{"../../examples/01-simplest.json"},
 			},
 			want:            1,
 			wantErrContains: "failed to parse input json",
@@ -79,7 +79,7 @@ func Test_RunCLI(t *testing.T) {
 			name: "map",
 			args: args{
 				input: goodArrayInput,
-				args:  []string{"../../examples/map.json"},
+				args:  []string{"../../examples/03-change-array.json"},
 			},
 			want:         0,
 			wantContains: `"status": "processed"`,
@@ -116,7 +116,7 @@ func TestRunCLI_Lint(t *testing.T) {
 		{
 			name: "simplest",
 			args: args{
-				filename: "../../examples/simplest.json",
+				filename: "../../examples/01-simplest.json",
 			},
 			want: 0,
 		},

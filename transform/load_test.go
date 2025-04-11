@@ -19,7 +19,7 @@ func TestLoadProgram(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				path: "../examples/simplest.json",
+				path: "../examples/01-simplest.json",
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return err == nil
