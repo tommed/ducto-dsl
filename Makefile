@@ -61,7 +61,7 @@ coverage:
 
 example-simplest:
 	@echo "==> Running simplest example"
-	@echo '{"foo":"bar"}' | $(GO) run ./cmd/ducto-dsl examples/simplest.json
+	@echo '{"foo":"bar"}' | $(GO) run ./cmd/ducto-dsl examples/01-simplest.json
 
 example-map:
 	@echo "==> Running map example"
