@@ -1,4 +1,4 @@
-# Aggregation Operators (Experimental)
+# Aggregation Operators
 
 This document outlines the design and specification for aggregation-related operators in `ducto-dsl`. These operators allow array traversal, summarisation, and statistical analysis over nested data structures.
 
@@ -87,9 +87,9 @@ Returns an array of all distinct values for a given field.
 }
 ```
 
-## Filtering Support (Planned)
+## Filtering Support
 
-In the future, aggregation operations may be combined with a `filter` operator that narrows the input array based on conditions:
+Aggregation operations can be combined with a `filter` operator that narrows the input array based on conditions:
 
 ```json5
 {
@@ -99,7 +99,7 @@ In the future, aggregation operations may be combined with a `filter` operator t
     "equals": { "key": "type", "value": "food" }
   },
   
-  // `as` is optional, defaults to '_ctx' if omitted. Useful for 
+  // `as` is optional, defaults to '_ctx' when omitted. Useful for 
   // filters in filters, so you can refer to all levels of arrays
   "as": "_ctx", 
   
