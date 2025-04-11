@@ -8,6 +8,7 @@
 *.so
 *.dylib
 ./ducto-dsl*
+.idea/**
 
 # Test binary, built with `go test -c`
 *.test
