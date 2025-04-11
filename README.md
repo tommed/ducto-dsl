@@ -43,14 +43,15 @@ See [doc/specs.md](docs/specs.md) for a specification of the DSL.
 
 ## Features (WIP)
 - [x] CLI for local testing
+- [x] Serverless runtime compatibility
 - [x] Declarative `set` and `copy` operations
-- [x] Support for `map`, `delete`, `merge`
+- [x] [Support for basics `map`, `delete`, `merge`](./docs/spec-v1.md)
 - [x] Linter included for instruction validation
 - [x] Conditionals
-- [ ] Embeddable Go SDK
+- [x] [Aggregations and Filtering](./docs/sped-aggs.md)
+- [x] Embeddable Go SDK
 - [ ] Input can be JSON or YAML
 - [ ] HCL-powered syntax option
-- [ ] Serverless runtime compatibility
 - [ ] OpenTelemetry instrumentation
 
 Also, see our [OSS Release Checklist](./OSS_RELEASE_CHECKLIST.md).
