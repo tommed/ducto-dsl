@@ -5,7 +5,7 @@
     </a>
 </p>
 
-# DSL Transformer — Specification (Draft v1)
+# DSL Transformer — Specification (v1)
 
 > A declarative, embeddable DSL for transforming structured data (JSON-like objects) through composable instructions.
 
